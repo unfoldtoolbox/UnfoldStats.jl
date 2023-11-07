@@ -1,0 +1,13 @@
+name = "UnfoldStats"
+uuid = "96fd419a-8306-4ce8-ba5b-cd907cb7647c"
+authors = ["Judith Schepers", "Benedikt V. Ehinger"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
