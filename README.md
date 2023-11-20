@@ -89,6 +89,8 @@ If you make use of these statistics, please cite:
 This project follows the [all-contributors](https://allcontributors.org/docs/en/specification) specification. 
 
 Contributions of any kind welcome!
+You can find the emoji key for the contributors [here](https://github.com/unfoldtoolbox/Unfold.jl/blob/main/docs/contrib-emoji.md)
+
 
 ## Acknowledgements
 
