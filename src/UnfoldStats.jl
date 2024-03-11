@@ -1,5 +1,7 @@
 module UnfoldStats
 
-# Write your package code here.
+using Unfold
+
+include("extract_coefs.jl")
 
 end
