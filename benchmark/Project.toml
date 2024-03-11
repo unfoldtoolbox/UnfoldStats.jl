@@ -1,0 +1,5 @@
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
+Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
+UnfoldSim = "ed8ae6d2-84d3-44c6-ab46-0baf21700804"

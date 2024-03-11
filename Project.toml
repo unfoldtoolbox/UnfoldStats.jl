@@ -3,6 +3,11 @@ uuid = "96fd419a-8306-4ce8-ba5b-cd907cb7647c"
 authors = ["Judith Schepers", "Benedikt V. Ehinger"]
 version = "1.0.0-DEV"
 
+[deps]
+BSplineKit = "093aae92-e908-43d7-9660-e50ee39d5a0a"
+StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
+Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
+
 [compat]
 julia = "1"
 
