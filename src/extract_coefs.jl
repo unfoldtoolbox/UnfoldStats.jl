@@ -107,6 +107,15 @@ function extract_coefs(model::UnfoldModel, predictor, basisname)
     return coef_subset#::Array{<:Union{<:Missing,<:Float64},3}
 end
 
+# Currently, `extract_coefs` is not implemented for mixed-effects models
+extract_coefs(
+    model::Union{UnfoldLinearMixedModel,UnfoldLinearMixedModelContinuousTime},
+    predictor,
+    basisname,
+) = throw(
+    "The `extract_coefs` function is currently not implemented for mixed-effects models.",
+)
+
 function extract_coefs(models::Vector{<:UnfoldModel}, predictor, basisname)
 
     # Extract the coefficients for all subjects
