@@ -1,6 +1,6 @@
 using UnfoldStats
-using Test
+include("setup.jl")
 
 @testset "UnfoldStats.jl" begin
-    # Write your tests here.
+    include("extract_coefs.jl")
 end
