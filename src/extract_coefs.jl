@@ -1,6 +1,30 @@
 # Helper functions
 const BSplineTerm = Base.get_extension(Unfold, :UnfoldBSplineKitExt).BSplineTerm
 
+"""
+    extract_symbol(t::AbstractTerm)
+
+Return the symbol(s) underlying a term from a model formula, repeated by their actual coefficient number (after StatsModels.apply_schema).
+
+# Examples
+```julia
+julia> f = @formula 0 ~ 1 + spl(continuous, 4) + continuous + condition + pet + condition & pet
+julia> ... # apply schema using an event dataframe, according to StatsModels
+julia> extract_symbol(f)
+8-element Vector{Any}:
+ "(Intercept)"
+ :continuous
+ :continuous
+ :continuous
+ :continuous
+ :condition
+ :pet
+ (:condition, :pet)
+```
+We get the actual symbols of each predictor - this is different to a function that would return the symbol for each term, which would be `["(Intercept)", :continuous,:continuous,:condition,:pet,(:condition,:pet) ]`
+
+The difference between those two cases would get even more stark, if a basisfunction is in play as it timeexpand terms into many more predictors.
+"""
 extract_symbol(t::AbstractTerm) = t.sym
 
 extract_symbol(t::InterceptTerm) = "(Intercept)"
@@ -15,14 +39,44 @@ extract_symbol(f::FormulaTerm) = vcat(extract_symbol.(f.rhs)...)
 extract_symbol(t::Vector) = vcat(extract_symbol.(t)...)
 extract_symbol(t::Tuple) = vcat(extract_symbol.(t)...)
 
+"""
+    contained_or_equal(p, e)
 
+Test if `p` equals `e` or whether `e` contains `p` if `e` is a tuple.
+"""
 contained_or_equal(p, e) = (p == e)
 contained_or_equal(p, e::Tuple) = (p in e)
 
+"""
+    get_predictor_string(p)
+
+Return string representation based on the type of `p`.
+
+This function is used for a useful display of variables e.g. in an error message.
+
+# Examples
+```jldoctest
+julia> get_predictor_string(:condition)
+":condition"
+```
+
+```jldoctest
+julia> get_predictor_string("(Intercept)")
+"\"(Intercept)\""
+```
+"""
 get_predictor_string(p::Symbol) = ":$p"
 get_predictor_string(p::String) = "\"$p\""
 get_predictor_string(p::Tuple) = "$p"
 
+"""
+    get_basisnames(model::UnfoldModel)
+
+Return the basisnames for all predictor terms as a vector.
+
+The returned vector contains the name of the event type/basis, repeated by their actual coefficient number (after StatsModels.apply_schema).
+If a model has more than one event type (e.g. stimulus and fixation), the vectors are concatenated.
+"""
 function get_basisnames(model::UnfoldLinearModel)
     # Extract the event names from the design
     design_keys = keys(Unfold.design(model))
@@ -51,7 +105,7 @@ For extracting the intercept `predictor` should be a String, i.e. "(Intercept)".
 Note: If a predictor variable has more than one term in the formula (e.g. a spline set, a categorical variable with several levels or an interaction),
 the coefficients for all terms are returned.
 
-The dimensions of the returned coefficients are channel x times x coefs.
+The dimensions of the returned coefficients are channel x times x coefficients.
 """
 function extract_coefs(model::UnfoldModel, predictor, basisname)
 
@@ -135,7 +189,7 @@ extract_coefs(
 
 When applied to a vector of Unfold models, extracts the coefficients (matching the predictor and basisname) for all models (usually subjects) and concatenates them.
 
-The dimensions of the returned coefficients are channel x times x coefs x subjects.
+The dimensions of the returned coefficients are channel x times x coefficients x subjects.
 """
 function extract_coefs(models::Vector{<:UnfoldModel}, predictor, basisname)
 
