@@ -56,12 +56,12 @@ This function is used for a useful display of variables e.g. in an error message
 
 # Examples
 ```jldoctest
-julia> get_predictor_string(:condition)
+julia> UnfoldStats.get_predictor_string(:condition)
 ":condition"
 ```
 
 ```jldoctest
-julia> get_predictor_string("(Intercept)")
+julia> UnfoldStats.get_predictor_string("(Intercept)")
 "\"(Intercept)\""
 ```
 """
