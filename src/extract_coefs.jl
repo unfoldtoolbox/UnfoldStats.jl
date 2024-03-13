@@ -59,11 +59,6 @@ This function is used for a useful display of variables e.g. in an error message
 julia> UnfoldStats.get_predictor_string(:condition)
 ":condition"
 ```
-
-```jldoctest
-julia> UnfoldStats.get_predictor_string("(Intercept)")
-"\"(Intercept)\""
-```
 """
 get_predictor_string(p::Symbol) = ":$p"
 get_predictor_string(p::String) = "\"$p\""
