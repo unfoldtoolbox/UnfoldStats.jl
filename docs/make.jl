@@ -33,9 +33,8 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Tutorials" => [
-            "Two-stage EEG analysis" => "generated/tutorial/two_stage_analysis.md",
-        ],
+        "Tutorials" =>
+            ["Two-stage EEG analysis" => "generated/tutorial/two_stage_analysis.md"],
     ],
 )
 
