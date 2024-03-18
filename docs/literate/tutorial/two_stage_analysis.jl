@@ -77,7 +77,7 @@ first(events, 12)
 # In the first stage, we fit an Unfold model for each subject separately.
 
 ## Specify a temporal basis function
-basisfunction = firbasis((-0.2, 1.0), 100)
+basisfunction = firbasis((-0.1, 0.7), 100)
 
 ## Specify the model formula
 formula = @formula 0 ~ 1 + spl(continuous, 4)
@@ -144,7 +144,7 @@ pos2d = [Point2f(p[1] + 0.5, p[2] + 0.5) for p in pos2d];
 # The rows (from top to bottom) represent the marginal effects for different levels of the predictor `continuous`.
 
 ## Set the size of the time bins for the topoplot series
-bin_size = 0.2
+bin_size = 0.1
 
 f_effects = Figure(size = (1200, 600))
 tp_effects = plot_topoplotseries!(
@@ -162,7 +162,7 @@ xlims!(ax, 0, 0.9)
 ylims!(ax, 0, 0.9)
 current_figure()
 
-# In the time windows `[0.0, 0.2)` and `[0.2, 0.4)`, one can see the effect of `continuous` that we simulated.
+# In the time windows `[0.1, 0.2)`, `[0.2, 0.3)` and `[0.3, 0.4)`, one can see the effect of `continuous` that we simulated.
 # In the next section, we want to quantify and test this effect.
 
 # ## 4. Extract coefficients & conduct Hotelling's T² tests
@@ -195,8 +195,9 @@ p_values_df = DataFrame(
 first(p_values_df, 5)
 
 # As a last step, we visualize the p-values in a topoplot series.
+bin_size = 0.1
 
-f_pvalues = Figure(size = (1000, 200))
+f_pvalues = Figure(size = (1200, 200))
 tp_pvalues = plot_topoplotseries!(
     f_pvalues,
     p_values_df,
