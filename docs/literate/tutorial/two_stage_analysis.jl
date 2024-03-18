@@ -213,3 +213,8 @@ linkaxes!(tp_pvalues.content[1:end-2]...)
 xlims!(ax, 0, 0.9)
 ylims!(ax, 0, 0.9)
 current_figure()
+
+# !!! note
+#     To decide whether to consider the effect statistically significant and to correct for multiple comparisons
+#     (due to different time points and channels), one could conduct a cluster-permutation test using the Hotelling's T² 
+#     values as the test statistic.
