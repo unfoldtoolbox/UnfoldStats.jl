@@ -97,7 +97,6 @@ for s = 1:size(data, ndims(data))
         event_dict,
         subset(events, :subject => ByRow(==(subject_list[s]))),
         data_slices[s],
-        progress = false,
     )
     push!(model_list, m)
 end
