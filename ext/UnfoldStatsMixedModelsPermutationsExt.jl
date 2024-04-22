@@ -145,3 +145,4 @@ function get_lmm_statistic(model::UnfoldLinearMixedModel, coefficient::Int, lmm_
     #    tvals = abs.(r.estimate ./ r.stderror)
     #    return tvals
 end
+end
