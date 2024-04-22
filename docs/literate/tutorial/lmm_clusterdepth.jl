@@ -49,7 +49,7 @@ data_e, events = UnfoldSim.simulate(
     return_epoched = true,
 ) # 18
 times = range(-0.1, 0.5, length = size(data_e, 1))
-data_e = reshape(data_e, size(data_e, 1), :)
+data_e = reshape(data_e, 1, size(data_e, 1), :)
 #events.latency .+= repeat(range(0,length=size(data,2),step=size(data,1)),inner=size(events[events.subject.=="S01",:],1))
 
 
