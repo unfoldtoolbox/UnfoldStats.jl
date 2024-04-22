@@ -1,23 +1,36 @@
 module UnfoldStatsMixedModelsPermutationsExt
 using Unfold
+import Unfold: pvalues
 using UnfoldStats
 #using MixedModels
 using MixedModelsPermutations
 using ClusterDepth
 using Logging
+using Random
+const MixedModels = MixedModelsPermutations.MixedModels
+LMMext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
 
-function UnfoldStat.pvalue(
+
+function Unfold.pvalues(
     rng,
-    model::UnfoldLinearMixedModel,
+    model::LMMext.UnfoldLinearMixedModel,
     data,
     coefficient;
     type = "clusterdepth",
+    clusterforming_threshold,
     kwargs...,
 )
     if type != "clusterdepth"
         error("other types (e.g. FDR currently not implemented")
     elseif type == "clusterdepth"
-        return lmm_clusterdepth(rng, model, data, coefficient; kwargs...)
+        return lmm_clusterdepth(
+            rng,
+            model,
+            data,
+            coefficient;
+            clusterforming_threshold,
+            kwargs...,
+        )
     end
 end
 
@@ -43,7 +56,13 @@ function lmm_clusterdepth(
         kwargs...,
     )
 end
-function lmm_clusterdepth_pvalues(observed, permuted; clusterforming_threshold)
+function lmm_clusterdepth_pvalues(
+    rng,
+    observed,
+    permuted;
+    clusterforming_threshold,
+    kwargs...,
+)
 
     # we need global variables here (yes, sorry...), because instead of actually
     # letting ClusterDepth do the permutation, we just have to index the already
@@ -56,7 +75,7 @@ function lmm_clusterdepth_pvalues(observed, permuted; clusterforming_threshold)
         return permuted[:, n_permutation_count]
     end
     J_tuple = ClusterDepth.perm_clusterdepths_both(
-        MersenneTwister(1),
+        rng,
         abs.(permuted),
         _fake_permutation_fun,
         clusterforming_threshold;
@@ -71,19 +90,18 @@ end
 function lmm_permutations(
     rng::AbstractRNG,
     model,
-    data,
+    data::AbstractArray{<:Real,3},
     coefficient::Int;
     n_permutations = 500,
     lmm_statistic = :z,
     time_selection = 1:size(data, 2),
 )
     permdata = Matrix{Float64}(undef, length(time_selection), n_permutations)
-    LMMext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
-    mm_outer = LMMext.LinearMixedModel_wrapper(
-        Unfold.formula(model),
-        data[1, 1, :],
-        modelmatrix(model),
-    )
+
+
+    Xs = LMMext.prepare_modelmatrix(model)
+
+    mm_outer = LMMext.LinearMixedModel_wrapper(Unfold.formulas(model), data[1, 1, :], Xs)
     mm_outer.optsum.maxtime = 0.1 # 
 
     chIx = 1 # for now we only support 1 channel anyway
@@ -98,7 +116,9 @@ function lmm_permutations(
         mm.y .= data[chIx, time_selection[tIx], :]
 
         # set the previous calculated model-fit
-        updateL!(MixedModels.setθ!(mm, Vector(model.modelfit.θ[time_selection[tIx]])))
+        θ = Vector(modelfit(model).θ[time_selection[tIx]])
+        @debug size(θ)
+        MixedModels.updateL!(MixedModels.setθ!(mm, θ))
 
         # get the coefficient 
         H0 = coef(mm)
@@ -106,21 +126,22 @@ function lmm_permutations(
         H0[coefficient] = 0
         # run the permutation
 
-        perm = undef
+        permutations = undef
         Logging.with_logger(NullLogger()) do   # remove NLopt warnings  
-            perm = permutation(
+            permutations = permutation(
                 deepcopy(rng), # important here is to set the same seed to keep flip all time-points the same
                 n_permutations,
                 mm;
                 β = H0,
-                progress = false,
+                hide_progress = true,
                 #blup_method = MixedModelsPermutations.olsranef,
             ) # constant rng to keep autocorr & olsranef for singular models
         end
 
         # extract the test-statistic
 
-        permdata[tIx, :] = get_lmm_statistic(permutations, coefficient, lmm_statistic)
+        permdata[tIx, :] =
+            get_lmm_statistic(model, permutations, coefficient, lmm_statistic)
 
         #next!(p)
     end # end for
@@ -128,18 +149,23 @@ function lmm_permutations(
 end
 
 function get_lmm_statistic(
-    permutations::MixedModelFitCollection,
+    model,
+    permutations::MixedModelsPermutations.MixedModels.MixedModelFitCollection,
     coefficient::Int,
     lmm_statistic,
 )
     [
-        getproperty(m, lmm_statistic) for
-        m in permutations.coefpvalues if String(m.coefname) == coefnames(mm)[coefficient]
+        getproperty(m, lmm_statistic) for m in permutations.coefpvalues if
+        String(m.coefname) == Unfold.coefnames(Unfold.formulas(model))[1][coefficient]
     ]
 
 end
-function get_lmm_statistic(model::UnfoldLinearMixedModel, coefficient::Int, lmm_statistic)
-    return get_lmm_statistic(modelfit(model).collection, coefficient, lmm_statistic)
+function get_lmm_statistic(
+    model::LMMext.UnfoldLinearMixedModel,
+    coefficient::Int,
+    lmm_statistic,
+)
+    return get_lmm_statistic(model, modelfit(model), coefficient, lmm_statistic)
     #    r = coeftable(m)
     #    r = subset(r, :group => (x -> isnothing.(x)), :coefname => (x -> x .!== "(Intercept)"))
     #    tvals = abs.(r.estimate ./ r.stderror)

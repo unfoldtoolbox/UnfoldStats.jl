@@ -3,7 +3,11 @@
 using UnfoldSim
 using Unfold
 using MixedModelsPermutations, ClusterDepth # both necessary to activate correct extension!
+using UnfoldStats
+using StatsModels
+using Random
 
+srate = 25
 design = MultiSubjectDesign(;
     n_subjects = 30,
     n_items = 40,
@@ -38,7 +42,6 @@ p3 = MixedModelComponent(;
 
 
 data_e, events = UnfoldSim.simulate(
-    MersenneTwister(23),
     design,
     [p1, n1, p3],
     UniformOnset(srate * 2, 10),
@@ -46,21 +49,20 @@ data_e, events = UnfoldSim.simulate(
     return_epoched = true,
 ) # 18
 times = range(-0.1, 0.5, length = size(data_e, 1))
-
+data_e = reshape(data_e, size(data_e, 1), :)
 #events.latency .+= repeat(range(0,length=size(data,2),step=size(data,1)),inner=size(events[events.subject.=="S01",:],1))
-#data_e,times = Unfold.epoch(data[:],events,[-0.1,0.5],srate)
-#events,data_e = Unfold.drop_missing_epochs(events,data_e)
+
 
 
 # # Fit LMM 
 m = fit(
     UnfoldModel,
-    Dict(
+    [
         Any => (
             @formula(0 ~ 1 + stimtype + (1 + stimtype | item) + (1 + stimtype | subject)),
             times,
         ),
-    ),
+    ],
     events,
     data_e,
 );
@@ -68,4 +70,11 @@ m = fit(
 
 # # Cluster Permute :)
 coefficient = 2
-pvalue(MersenneTwister(1), m, data_e, coefficient; n_permutations = 100)
+pvalues(
+    MersenneTwister(1),
+    m,
+    data_e,
+    coefficient;
+    n_permutations = 10,
+    clusterforming_threshold = 1.8,
+)
