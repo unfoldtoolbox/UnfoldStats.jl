@@ -2,7 +2,7 @@ module UnfoldStatsMixedModelsExt
 using Unfold
 using UnfoldStats
 using MixedModels
-import StatsAPI: pvalue
+
 
 lmm_ext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
 
