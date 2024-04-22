@@ -35,6 +35,7 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials" =>
             ["Two-stage EEG analysis" => "generated/tutorial/two_stage_analysis.md"],
+        ["LMM EEG + ClusterDepth" => "generated/tutorial/lmm_clusterdepth.md"],
     ],
 )
 
