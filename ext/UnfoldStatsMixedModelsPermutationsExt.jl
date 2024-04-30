@@ -133,7 +133,7 @@ function lmm_permutations(
                 n_permutations,
                 mm;
                 β = H0,
-                hide_progress = true,
+                progress = false,
                 #blup_method = MixedModelsPermutations.olsranef,
             ) # constant rng to keep autocorr & olsranef for singular models
         end
