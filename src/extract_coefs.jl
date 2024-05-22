@@ -35,7 +35,7 @@ extract_symbol(t::FunctionTerm) = extract_symbol.(t.args)
 extract_symbol(t::MatrixTerm) = extract_symbol(t.terms)
 extract_symbol(t::Unfold.TimeExpandedTerm) =
     repeat(extract_symbol(t.term), inner = length(Unfold.colnames(t.basisfunction)))
-extract_symbol(f::FormulaTerm) = vcat(extract_symbol.(f.rhs)...)
+extract_symbol(f::FormulaTerm) = extract_symbol(f.rhs)
 extract_symbol(t::Vector) = vcat(extract_symbol.(t)...)
 extract_symbol(t::Tuple) = vcat(extract_symbol.(t)...)
 
