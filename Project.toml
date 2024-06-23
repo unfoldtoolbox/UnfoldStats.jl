@@ -1,7 +1,7 @@
 name = "UnfoldStats"
 uuid = "96fd419a-8306-4ce8-ba5b-cd907cb7647c"
 authors = ["Judith Schepers", "Benedikt V. Ehinger"]
-version = "1.0.0-DEV"
+version = "0.2.0"
 
 [deps]
 BSplineKit = "093aae92-e908-43d7-9660-e50ee39d5a0a"
@@ -29,7 +29,7 @@ ClusterDepth = "0.2"
 MixedModels = "4"
 MixedModelsPermutations = "0.2"
 StatsModels = "0.7"
-Unfold = "0.6,0.7"
+Unfold = "0.7"
 julia = "1.9,1.10"
 
 [extras]
