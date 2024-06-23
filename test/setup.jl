@@ -4,5 +4,5 @@ using Unfold
 using DataFrames
 using StableRNGs
 
-includet("../benchmark/types.jl")
-includet("../benchmark/sim_and_fit.jl")
+include("../benchmark/types.jl")
+include("../benchmark/sim_and_fit.jl")
