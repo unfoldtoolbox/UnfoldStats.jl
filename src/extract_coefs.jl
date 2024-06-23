@@ -35,7 +35,7 @@ extract_symbol(t::FunctionTerm) = extract_symbol.(t.args)
 extract_symbol(t::MatrixTerm) = extract_symbol(t.terms)
 extract_symbol(t::Unfold.TimeExpandedTerm) =
     repeat(extract_symbol(t.term), inner = length(Unfold.colnames(t.basisfunction)))
-extract_symbol(f::FormulaTerm) = vcat(extract_symbol.(f.rhs)...)
+extract_symbol(f::FormulaTerm) = extract_symbol(f.rhs)
 extract_symbol(t::Vector) = vcat(extract_symbol.(t)...)
 extract_symbol(t::Tuple) = vcat(extract_symbol.(t)...)
 
@@ -63,30 +63,6 @@ julia> UnfoldStats.get_predictor_string(:condition)
 get_predictor_string(p::Symbol) = ":$p"
 get_predictor_string(p::String) = "\"$p\""
 get_predictor_string(p::Tuple) = "$p"
-
-"""
-    get_basisnames(model::UnfoldModel)
-
-Return the basisnames for all predictor terms as a vector.
-
-The returned vector contains the name of the event type/basis, repeated by their actual coefficient number (after StatsModels.apply_schema).
-If a model has more than one event type (e.g. stimulus and fixation), the vectors are concatenated.
-"""
-function get_basisnames(model::UnfoldLinearModel)
-    # Extract the event names from the design
-    design_keys = keys(Unfold.design(model))
-
-    # Create a list of the basis names corresponding to each model term
-    basisnames = String[]
-    for (ix, event) in enumerate(design_keys)
-        push!(basisnames, repeat(["event: $(event)"], size(modelmatrix(model)[ix], 2))...)
-    end
-    return basisnames
-end
-
-get_basisnames(model::UnfoldLinearModelContinuousTime) =
-    Unfold.extract_coef_info(Unfold.get_coefnames(model), 1)
-
 """
     extract_coefs(model::UnfoldModel, predictor, basisname)
 
@@ -105,7 +81,7 @@ The dimensions of the returned coefficients are channel x times x coefficients.
 function extract_coefs(model::UnfoldModel, predictor, basisname)
 
     # Get vector with underlying predictor variable (symbol) for all coefficients
-    symbols = extract_symbol(Unfold.formula(model))
+    symbols = extract_symbol(Unfold.formulas(model))
 
     # Check whether `predictor` is a predictor in the model
     if predictor ∉ symbols
@@ -119,10 +95,10 @@ function extract_coefs(model::UnfoldModel, predictor, basisname)
         )
     end
 
-    basisname_list = get_basisnames(model)
+    basisname_list = Unfold.get_basis_names(model)
 
     # Check whether given `basisname` is in the basisname list of the model
-    if basisname ∉ basisname_list
+    if basisname ∉ vcat(basisname_list...)
         allowed_basisnames = join(["\"$b\"" for b in unique(basisname_list)], ", ")
 
         throw(
@@ -136,7 +112,7 @@ function extract_coefs(model::UnfoldModel, predictor, basisname)
     mask_predictor = contained_or_equal.(predictor, symbols)
 
     # Create a boolean mask which is true for the model coefficients that belong to the given basis name
-    mask_basisfunction = basisname_list .== basisname
+    mask_basisfunction = vcat(basisname_list...) .== basisname
 
     mask_combined = mask_predictor .* mask_basisfunction
 
@@ -151,10 +127,10 @@ function extract_coefs(model::UnfoldModel, predictor, basisname)
     end
 
     # Extract the requested coefficients from the coefficient array
-    if typeof(model) == UnfoldLinearModel
+    if isa(model, UnfoldLinearModel)
         coef_subset = coef(model)[:, :, mask_combined]
 
-    elseif typeof(model) == UnfoldLinearModelContinuousTime
+    elseif isa(model, UnfoldLinearModelContinuousTime)
 
         n_coefs = length(
             unique(Unfold.extract_coef_info(Unfold.get_coefnames(model), 2)[mask_combined]),

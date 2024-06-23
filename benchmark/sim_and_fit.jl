@@ -36,7 +36,8 @@ function sim_and_fit(
 )
 
     # At the moment, the function is not implemented for mixed models
-    if model_type in [UnfoldLinearMixedModel, UnfoldLinearMixedModelContinuousTime]
+    ext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
+    if model_type in [ext.UnfoldLinearMixedModel, ext.UnfoldLinearMixedModelContinuousTime]
         throw("Not implemented.")
     end
 
@@ -117,8 +118,8 @@ function create_event_dict(
         t_stim = times
         t_fix = times
     else # UnfoldLinearModelContinuousTime
-        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100, name = "stimulus")
-        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100, name = "fixation")
+        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100, name = "stim")
+        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100, name = "fix")
     end
 
     # Define formula(s)
@@ -144,8 +145,8 @@ function create_event_dict(
         t_stim = times
         t_fix = times
     else # UnfoldLinearModelContinuousTime
-        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100, name = "stimulus")
-        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100, name = "fixation")
+        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100, name = "stim")
+        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100, name = "fix")
     end
 
     # Define formula(s)
@@ -153,9 +154,9 @@ function create_event_dict(
     f_fix = @formula 0 ~ 1 + spl(continuous, 4)
 
     # Combine basis function(s)/times and formula(s) with the corresponding event
-    event_dict = Dict("stim" => (f_stim, t_stim), "fix" => (f_fix, t_fix))
+    event_vec = ["stim" => (f_stim, t_stim), "fix" => (f_fix, t_fix)]
 
-    return event_dict
+    return event_vec
 end
 
 function create_event_dict(
@@ -176,9 +177,9 @@ function create_event_dict(
     f = @formula 0 ~ 1 + spl(continuous, 4) + continuous + condition * pet
 
     # Combine basis function(s)/times and formula(s) with the corresponding event
-    event_dict = Dict(Any => (f, t))
+    event_vec = [Any => (f, t)]
 
-    return event_dict
+    return event_vec
 end
 
 function create_event_dict(
@@ -199,9 +200,9 @@ function create_event_dict(
     f = @formula 0 ~ 1 + spl(continuous, 4)
 
     # Combine basis function(s)/times and formula(s) with the corresponding event
-    event_dict = Dict(Any => (f, t))
+    event_vec = [Any => (f, t)]
 
-    return event_dict
+    return event_vec
 end
 
 get_conditions(sim_type::T) where {T} = get_conditions(PredictorStyle(T))
