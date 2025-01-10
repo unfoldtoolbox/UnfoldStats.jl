@@ -6,6 +6,7 @@ using MixedModelsPermutations, ClusterDepth # both necessary to activate correct
 using UnfoldStats
 using StatsModels
 using Random
+using MixedModels
 
 srate = 25
 design = MultiSubjectDesign(;

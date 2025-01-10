@@ -11,6 +11,7 @@ using HypothesisTests
 using CairoMakie
 using UnfoldMakie
 
+
 # ## 1. Simulate data
 # This section can be skipped, if one already has (real) data that they want to analyse.
 
@@ -124,7 +125,7 @@ effects_all_subjects = combine(
 ## Aggregate the marginal effects (per event type, time point and channel) over subjects
 ## using the mean as aggregation function
 aggregated_effects = @chain effects_all_subjects begin
-    groupby([:basisname, :channel, collect(keys(predictor_dict))..., :time])
+    groupby([:eventname, :channel, collect(keys(predictor_dict))..., :time])
     combine(:yhat .=> [x -> mean(skipmissing(x))] .=> Symbol("yhat_", mean))
 end;
 first(aggregated_effects, 5)
@@ -172,8 +173,8 @@ current_figure()
 
 ## Extract the spline coefficients for the `continuous` predictor variable
 ## from the Unfold models of all subjects
-basisname = unique(effects_all_subjects.basisname)
-coefs = extract_coefs(models.unfoldmodel, :continuous, basisname)
+eventname = unique(effects_all_subjects.eventname)
+coefs = extract_coefs(models.unfoldmodel, :continuous, eventname)
 
 ## Conduct a one-sample Hotelling's T² test separately for all channels and time points
 ## and compute a p-value. We compare the spline coefficients vector against 0.
