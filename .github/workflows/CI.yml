@@ -64,3 +64,9 @@ jobs:
             using UnfoldStats
             DocMeta.setdocmeta!(UnfoldStats, :DocTestSetup, :(using UnfoldStats); recursive=true)
             doctest(UnfoldStats)'
+      - name: Update UnfoldDocs
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.UNFOLDDOCSPAT }}
+          repository: unfoldtoolbox/UnfoldDocs
+          event-type: individual-docs-updated
