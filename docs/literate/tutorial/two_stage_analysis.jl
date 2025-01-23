@@ -56,7 +56,7 @@ noise = PinkNoise(; noiselevel = 5)
 # </details >
 # ```
 
-data, events = simulate(
+data, events = UnfoldSim.simulate(
     StableRNG(1),
     design,
     signal_multichannel,
@@ -84,7 +84,7 @@ basisfunction = firbasis((-0.1, 0.7), 100)
 formula = @formula 0 ~ 1 + spl(continuous, 4)
 
 ## Combine basisfunction and formula in an event dict
-event_dict = Dict(Any => (formula, basisfunction))
+event_vec = [Any => (formula, basisfunction)]
 
 subject_list = unique(events.subject)
 model_list = UnfoldLinearModelContinuousTime[]
@@ -95,7 +95,7 @@ data_slices = eachslice(data, dims = ndims(data))
 for s = 1:size(data, ndims(data))
     m = fit(
         UnfoldModel,
-        event_dict,
+        event_vec,
         subset(events, :subject => ByRow(==(subject_list[s]))),
         data_slices[s],
     )
@@ -144,15 +144,15 @@ pos2d = [Point2f(p[1] + 0.5, p[2] + 0.5) for p in pos2d];
 # The rows (from top to bottom) represent the marginal effects for different levels of the predictor `continuous`.
 
 ## Set the size of the time bins for the topoplot series
-bin_size = 0.1
-
+bin_width = 0.1
+aggregated_effects.estimate = aggregated_effects.yhat_mean # bug in UnfoldMakie 0.5.12
 f_effects = Figure(size = (1200, 600))
 tp_effects = plot_topoplotseries!(
     f_effects,
-    aggregated_effects,
-    bin_size,
+    aggregated_effects;
+    bin_width,
     positions = pos2d,
-    mapping = (; y = :yhat_mean, row = :continuous),
+    mapping = (; y = :estimate, row = :continuous),
     visual = (; enlarge = 0.6, label_scatter = false, colorrange = (-3, 3)),
 )
 
@@ -195,15 +195,15 @@ p_values_df = DataFrame(
 first(p_values_df, 5)
 
 # As a last step, we visualize the p-values in a topoplot series.
-bin_size = 0.1
-
+bin_width = 0.1
+p_values_df.estimate = p_values_df.p_values
 f_pvalues = Figure(size = (1200, 200))
 tp_pvalues = plot_topoplotseries!(
     f_pvalues,
-    p_values_df,
-    bin_size,
+    p_values_df;
+    bin_width,
     positions = pos2d,
-    mapping = (; y = :p_values),
+    mapping = (; y = :estimate),
     visual = (; enlarge = 0.6, label_scatter = false, colorrange = (0, 0.1)),
     colorbar = (; label = "p-value"),
 )

@@ -1,12 +1,12 @@
 
 # get some data
 using UnfoldSim
-using Unfold
+using UnfoldMixedModels
+
 using MixedModelsPermutations, ClusterDepth # both necessary to activate correct extension!
 using UnfoldStats
 using StatsModels
 using Random
-using MixedModels
 
 srate = 25
 design = MultiSubjectDesign(;
@@ -71,7 +71,7 @@ m = fit(
 
 # # Cluster Permute :)
 coefficient = 2
-pvalues(
+pvalue(
     MersenneTwister(1),
     m,
     data_e,

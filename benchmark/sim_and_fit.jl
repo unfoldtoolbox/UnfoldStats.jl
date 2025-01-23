@@ -1,5 +1,5 @@
 using UnfoldSim
-using Unfold
+using Unfold, UnfoldMixedModels
 using StableRNGs
 using DataFrames
 
@@ -36,8 +36,8 @@ function sim_and_fit(
 )
 
     # At the moment, the function is not implemented for mixed models
-    ext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
-    if model_type in [ext.UnfoldLinearMixedModel, ext.UnfoldLinearMixedModelContinuousTime]
+    #ext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
+    if model_type in [UnfoldLinearMixedModel, UnfoldLinearMixedModelContinuousTime]
         throw("Not implemented.")
     end
 
