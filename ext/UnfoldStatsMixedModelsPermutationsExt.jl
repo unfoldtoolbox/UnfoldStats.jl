@@ -1,19 +1,16 @@
 module UnfoldStatsMixedModelsPermutationsExt
-using Unfold
-import Unfold: pvalues
+
+using UnfoldMixedModels
 using UnfoldStats
 #using MixedModels
 using MixedModelsPermutations
 using ClusterDepth
 using Logging
 using Random
-const MixedModels = MixedModelsPermutations.MixedModels
-LMMext = Base.get_extension(Unfold, :UnfoldMixedModelsExt)
 
-
-function Unfold.pvalues(
+function UnfoldStats.pvalue(
     rng,
-    model::LMMext.UnfoldLinearMixedModel,
+    model::UnfoldLinearMixedModel,
     data,
     coefficient;
     type = "clusterdepth",
@@ -99,9 +96,13 @@ function lmm_permutations(
     permdata = Matrix{Float64}(undef, length(time_selection), n_permutations)
 
 
-    Xs = LMMext.prepare_modelmatrix(model)
+    Xs = UnfoldMixedModels.prepare_modelmatrix(model)
 
-    mm_outer = LMMext.LinearMixedModel_wrapper(Unfold.formulas(model), data[1, 1, :], Xs)
+    mm_outer = UnfoldMixedModels.LinearMixedModel_wrapper(
+        Unfold.formulas(model),
+        data[1, 1, :],
+        Xs,
+    )
     mm_outer.optsum.maxtime = 0.1 # 
 
     chIx = 1 # for now we only support 1 channel anyway
@@ -160,11 +161,7 @@ function get_lmm_statistic(
     ]
 
 end
-function get_lmm_statistic(
-    model::LMMext.UnfoldLinearMixedModel,
-    coefficient::Int,
-    lmm_statistic,
-)
+function get_lmm_statistic(model::UnfoldLinearMixedModel, coefficient::Int, lmm_statistic)
     return get_lmm_statistic(model, modelfit(model), coefficient, lmm_statistic)
     #    r = coeftable(m)
     #    r = subset(r, :group => (x -> isnothing.(x)), :coefname => (x -> x .!== "(Intercept)"))

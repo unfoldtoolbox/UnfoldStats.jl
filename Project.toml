@@ -16,21 +16,22 @@ Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
 
 [weakdeps]
 ClusterDepth = "c8d8bbfa-f476-4995-adff-2987f04015d1"
-MixedModels = "ff71e718-51f3-5ec2-a782-8ffcbfa3c316"
 MixedModelsPermutations = "647c4018-d7ef-4d03-a0cc-8889a722319e"
+UnfoldMixedModels = "019ae9e0-8363-565c-86e5-97a5a2fe84f4"
 
 [extensions]
-UnfoldStatsMixedModelsExt = ["MixedModels"]
-UnfoldStatsMixedModelsPermutationsExt = ["ClusterDepth", "MixedModelsPermutations"]
+UnfoldStatsMixedModelsExt = ["UnfoldMixedModels"]
+UnfoldStatsMixedModelsPermutationsExt = ["UnfoldMixedModels", "ClusterDepth", "MixedModelsPermutations"]
 
 [compat]
 BSplineKit = "0.16,0.17"
 ClusterDepth = "0.2"
-MixedModels = "4"
 MixedModelsPermutations = "0.2"
+StatsAPI = "1.7.0"
 StatsModels = "0.7"
-Unfold = "0.7.4"
-julia = "1.9,1.10"
+Unfold = "0.8"
+UnfoldMixedModels = "0.1"
+julia = "1.9,1.10,1.11"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
