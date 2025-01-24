@@ -34,8 +34,9 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Tutorials" => [
-            "Two-stage EEG analysis" => "generated/tutorial/two_stage_analysis.md",
-            "LMM EEG + ClusterDepth" => "generated/tutorial/lmm_clusterdepth.md",
+            "2-stage single parameter test" => "tutorial/test_single_coefficient.md",
+            "Test multi-channel spline-effects" => "generated/tutorial/two_stage_analysis.md",
+            "**MixedModels** EEG + Clusterpermutation" => "generated/tutorial/lmm_clusterdepth.md",
         ],
     ],
 )

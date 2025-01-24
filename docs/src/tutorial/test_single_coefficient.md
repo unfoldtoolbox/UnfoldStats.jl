@@ -27,7 +27,7 @@ models = map((d, ev) -> (fit(UnfoldModel, formula, DataFrame(ev), d, ), ev.subje
 
 now we can inspect the data easily, and extract the face-effect
 
-````@example eeg
+````@example eeg-multichannel
 function add_subject!(df, s)
     df[!, :subject] .= s
     return df
@@ -39,14 +39,14 @@ plot_erp(allEffects; mapping=(color=:condition, group=:subject))
 
 extract the face-coefficient from the linear model
 
-````@example eeg
+````@example eeg-multichannel
 allCoefs = map(m -> (coeftable(m[1]), m[2]) |> (x) -> add_subject!(x[1], x[2]), models) |> e -> reduce(vcat, e)
 plot_erp(allCoefs; mapping=(group=:subject, col=:coefname))
 ````
 
 let's unstack the tidy-coef table into a matrix and put it to clusterdepth for clusterpermutation testing
 
-````@example eeg
+````@example eeg-multichannel
 faceCoefs = allCoefs |> x -> subset(x, :coefname => x -> x .== "condition: face")
 erpMatrix = unstack(faceCoefs, :subject, :time, :estimate) |> x -> Matrix(x[:, 2:end])' |> collect
 summary(erpMatrix)
@@ -54,7 +54,7 @@ summary(erpMatrix)
 
 ## Clusterdepth
 
-````@example eeg
+````@example eeg-multichannel
 pvals = clusterdepth(erpMatrix; τ=quantile(TDist(n_subjects - 1), 0.95), nperm=5000);
 nothing #hide
 ````
@@ -66,7 +66,7 @@ Some plotting, and we add the identified cluster
 
 first calculate the ERP
 
-````@example eeg
+````@example eeg-multichannel
 faceERP = groupby(faceCoefs, [:time, :coefname]) |>
           x -> combine(x, :estimate => mean => :estimate,
     :estimate => std => :stderror);
@@ -75,16 +75,9 @@ nothing #hide
 
 put the pvalues into a nicer format
 
-````@example eeg
+````@example eeg-multichannel
 pvalDF = ClusterDepth.cluster(pvals .<= 0.05) |> x -> DataFrame(:from => x[1] ./ 250, :to => (x[1] .+ x[2]) ./ 250, :coefname => "condition: face")
 plot_erp(faceERP; stderror=true, pvalue=pvalDF)
 ````
 
 Looks good to me! We identified the cluster :-)
-
-old unused code to use extra=(;pvalue=pvalDF) in the plotting function, but didnt work.
-
----
-
-*This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
-
