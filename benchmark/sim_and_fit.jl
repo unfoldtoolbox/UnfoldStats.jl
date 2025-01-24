@@ -82,7 +82,8 @@ simulate_data(sim_type::T, simulation, return_epoched, seed) where {T} =
 function simulate_data(::SingleEventType, simulation, return_epoched, seed)
 
     # Simulate data
-    data, events = simulate(StableRNG(seed), simulation; return_epoched = return_epoched)
+    data, events =
+        UnfoldSim.simulate(StableRNG(seed), simulation; return_epoched = return_epoched)
 
     return data, events
 end
@@ -90,7 +91,8 @@ end
 function simulate_data(::MultipleEventTypes, simulation, return_epoched, seed)
 
     # Simulate data
-    data, events = simulate(StableRNG(seed), simulation; return_epoched = return_epoched)
+    data, events =
+        UnfoldSim.simulate(StableRNG(seed), simulation; return_epoched = return_epoched)
 
     # Add an event column to the events df and assign each event to an event type
     events[!, :event] = repeat(["stim", "fix"], size(events, 1) ÷ 2)
