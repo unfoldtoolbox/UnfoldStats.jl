@@ -35,7 +35,7 @@ makedocs(;
         "Home" => "index.md",
         "Tutorials" => [
             "2-stage single parameter test" => "tutorial/test_single_coefficient.md",
-            "Test multi-channel spline-effects" => "generated/tutorial/two_stage_analysis.md",
+            "Test multi-channel spline-effects" => "generated/tutorial/test_splines.md",
             "**MixedModels** EEG + Clusterpermutation" => "generated/tutorial/lmm_clusterdepth.md",
         ],
     ],
