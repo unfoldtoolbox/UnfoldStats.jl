@@ -16,7 +16,8 @@ This is an adaptation of the [ClusterDepth.jl tutorial](https://www.s-ccs.de/Clu
 
 Let's create data from 20 subjects
 ````@example eeg
-data,events = UnfoldSim.predef_eeg(20;return_epoched=true)
+n_subjects = 20
+data,events = UnfoldSim.predef_eeg(n_subjects;return_epoched=true)
 times = range(0,step=1/100,length=size(data,1))
 ````
 Fit an UnfoldModel to each subject
@@ -57,6 +58,7 @@ summary(erpMatrix)
 ## Clusterdepth
 
 ````@example eeg
+
 pvals = clusterdepth(erpMatrix; τ=quantile(TDist(n_subjects - 1), 0.95), nperm=5000);
 nothing #hide
 ````
@@ -79,7 +81,7 @@ put the pvalues into a nicer format
 
 ````@example eeg
 pvalDF = ClusterDepth.cluster(pvals .<= 0.05) |> x -> DataFrame(:from => x[1] ./ 250, :to => (x[1] .+ x[2]) ./ 250, :coefname => "condition: face")
-plot_erp(faceERP; stderror=true, pvalue=pvalDF)
+plot_erp(faceERP; stderror=true, significance=pvalDF)
 ````
 
 Looks good to me! We identified the cluster :-)
