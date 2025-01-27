@@ -7,6 +7,7 @@ using UnfoldMakie
 using Statistics
 using ClusterDepth
 using DataFrames
+using Distributions
 ````
 
 # # Unfold single parameter testing
