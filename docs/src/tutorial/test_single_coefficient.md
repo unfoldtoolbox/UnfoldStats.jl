@@ -6,6 +6,7 @@ using Unfold
 using UnfoldMakie
 using Statistics
 using ClusterDepth
+using DataFrames
 ````
 
 # # Unfold single parameter testing
@@ -15,12 +16,12 @@ This is an adaptation of the [ClusterDepth.jl tutorial](https://www.s-ccs.de/Clu
 Let's create data from 20 subjects
 ````@example eeg
 data,events = UnfoldSim.predef_eeg(20;return_epoched=true)
-times = range(0,step=1/100,length=size(data,2))
+times = range(0,step=1/100,length=size(data,1))
 ````
 Fit an UnfoldModel to each subject
 ````@example eeg
 formula = @formula(0 ~ 1 + condition)
-models = map((d, ev) -> (fit(UnfoldModel, formula, DataFrame(ev), d, ), ev.subject[1]),
+models = map((d, ev) -> (fit(UnfoldModel, formula, DataFrame(ev), collect(d), times), ev.subject[1]),
     eachslice(data; dims=3),
     groupby(events, :subject))
 ````
