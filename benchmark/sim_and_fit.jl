@@ -52,7 +52,7 @@ function sim_and_fit(
     data, events = simulate_data(sim_type, simulation, return_epoched, seed)
 
     # Create event dict containing basis function(s)/times and formula(s) for all events
-    event_dict = create_event_dict(sim_type, model_type, simulation)
+    event_dict = create_event_vector(sim_type, model_type, simulation)
 
     # Fit an Unfold model for each subject
     subject_list = unique(events.subject)
@@ -100,14 +100,14 @@ function simulate_data(::MultipleEventTypes, simulation, return_epoched, seed)
     return data, events
 end
 
-create_event_dict(sim_type::T, model_type, simulation) where {T} = create_event_dict(
+create_event_vector(sim_type::T, model_type, simulation) where {T} = create_event_vector(
     EventStyle(T),
     PredictorStyle(T),
     model_type::Type{<:UnfoldModel},
     simulation,
 )
 
-function create_event_dict(
+function create_event_vector(
     ::MultipleEventTypes,
     ::ManyPredictors,
     model_type::Type{<:UnfoldModel},
@@ -134,7 +134,7 @@ function create_event_dict(
     return event_dict
 end
 
-function create_event_dict(
+function create_event_vector(
     ::MultipleEventTypes,
     ::OnlySplines,
     model_type::Type{<:UnfoldModel},
@@ -161,7 +161,7 @@ function create_event_dict(
     return event_vec
 end
 
-function create_event_dict(
+function create_event_vector(
     ::SingleEventType,
     ::ManyPredictors,
     model_type::Type{<:UnfoldModel},
@@ -184,7 +184,7 @@ function create_event_dict(
     return event_vec
 end
 
-function create_event_dict(
+function create_event_vector(
     ::SingleEventType,
     ::OnlySplines,
     model_type::Type{<:UnfoldModel},
