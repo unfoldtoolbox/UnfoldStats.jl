@@ -8,7 +8,6 @@
     σs = Dict(:subject => [1, 0.1, 0.1, 0.1])
 
     simulation = define_simulation(sim_type, β, σs, n_subjects = 5)
-    model_type = UnfoldLinearModelContinuousTime
     for model_type in [UnfoldLinearModel, UnfoldLinearModelContinuousTime]
 
         models = sim_and_fit(sim_type, simulation, model_type, seed = 1)
@@ -44,7 +43,7 @@
 
             # Test exceptions
             @test_throws ArgumentError extract_coefs(model_1, "continuous", "fix")
-            @test_throws ArgumentError extract_coefs(model_1, :continuous, "bla fix")
+            @test_throws ArgumentError extract_coefs(model_1, :continuous, "this-basis-doesnt-exist")
             @test_throws ArgumentError extract_coefs(model_1, :pet, "stim")
 
             # Test `extract_coefs` method for single Unfold model

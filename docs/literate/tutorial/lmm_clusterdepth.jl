@@ -1,4 +1,5 @@
-
+# !!! important
+#       This functionality is not tested. While it returns reasonable results, we haven't written any unit-tests, nor tested the type-1 error probability yet
 # get some data
 using UnfoldSim
 using UnfoldMixedModels

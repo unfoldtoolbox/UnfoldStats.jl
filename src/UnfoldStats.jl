@@ -1,6 +1,5 @@
 module UnfoldStats
 
-using BSplineKit: Reexport
 using Unfold
 using BSplineKit
 using StatsModels
