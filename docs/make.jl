@@ -34,9 +34,9 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Tutorials" => [
-            "two stage single parameter test (ttest)" => "tutorial/test_single_coefficient.md",
-            "two stage multi parameter test (hotelling-T²)) => "generated/tutorial/test_splines.md",
-            "**MixedModels** EEG + Clusterpermutation" => "generated/tutorial/lmm_clusterdepth.md",
+            "Two-stage single parameter test (t-test)" => "tutorial/test_single_coefficient.md",
+            "Two-stage multi parameter test (Hotelling's T-squared test)" => "generated/tutorial/test_splines.md",
+            "**MixedModels** EEG + Cluster permutation test" => "generated/tutorial/lmm_clusterdepth.md",
         ],
     ],
 )
