@@ -1,5 +1,5 @@
 # !!! important
-#       This functionality is not tested. While it returns reasonable results, we haven't written any unit-tests, nor tested the type-1 error probability yet
+#       This functionality is not extensively tested. While it returns reasonable results, we haven't written any unit-tests, nor tested the type-1 error probability yet
 
 
 # ## 1. Simulate data
@@ -57,10 +57,10 @@ data_e, events = UnfoldSim.simulate(
     UniformOnset(srate * 2, 10),
     PinkNoise(; noiselevel = 1);
     return_epoched = true,
-) # 18
+)
 times = range(-0.1, 0.5, length = size(data_e, 1))
 data_e = reshape(data_e, 1, size(data_e, 1), :)
-#events.latency .+= repeat(range(0,length=size(data,2),step=size(data,1)),inner=size(events[events.subject.=="S01",:],1))
+nothing ##hide
 # ```@raw html
 # </details >
 # ```
@@ -85,9 +85,9 @@ m = fit(
 # One solution are cluster permutation test, where we instead test for clustersizes of connected significant clusters. In "classical" two-stage testing, such a permutation test is straight forward. But for LMMs we have to think of something more clever, as it is not directly clear how to permute if both subject and item effects exist (you gonna break the relation between the two). We did that in `MixedModelsPermutations` and can apply this strategy to EEG data as well.`
 
 # select the fixed-effects coefficient to test (`stimtype`)
-coefficient = 2
+coefficient = 2;
 
-# call the permutatio test
+# call the permutation test
 # !!! note
 #      This interface is very likely to change in the future
 pvalue(
@@ -95,6 +95,7 @@ pvalue(
     m,
     data_e,
     coefficient;
-    n_permutations = 10,
+    n_permutations = 20,
     clusterforming_threshold = 1.8,
 )
+

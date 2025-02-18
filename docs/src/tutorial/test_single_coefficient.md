@@ -8,10 +8,11 @@ We simulate a 1x2 design and perform cluster permutation testing via the `Cluste
 ## Simulate data
 Let's create data from 20 subjects
 
- ```@raw html
+```@raw html
  <details>
  <summary>Click to expand the simulation details</summary>
- ```
+```
+
 ```@example eeg
 using Random
 using CairoMakie
@@ -22,19 +23,17 @@ using Statistics
 using ClusterDepth
 using DataFrames
 using Distributions
-```
 
-
-
-```@example eeg
 n_subjects = 20
 data,events = UnfoldSim.predef_eeg(n_subjects;return_epoched=true)
 times = range(0,step=1/100,length=size(data,1))
+
+nothing #hide
 ```
 
- ```@raw html
+```@raw html
  </details >
- ```
+```
 
 ## Fitting regression Models
 Fit an UnfoldModel to each subject:
