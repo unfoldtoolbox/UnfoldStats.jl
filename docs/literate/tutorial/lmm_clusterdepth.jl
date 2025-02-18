@@ -1,6 +1,14 @@
 # !!! important
 #       This functionality is not tested. While it returns reasonable results, we haven't written any unit-tests, nor tested the type-1 error probability yet
-# get some data
+
+
+# ## 1. Simulate data
+# This section can be skipped, if one already has (real) data that they want to analyse.
+
+# ```@raw html
+# <details>
+# <summary>Click to expand the simulation details</summary>
+# ```
 using UnfoldSim
 using UnfoldMixedModels
 
@@ -53,10 +61,12 @@ data_e, events = UnfoldSim.simulate(
 times = range(-0.1, 0.5, length = size(data_e, 1))
 data_e = reshape(data_e, 1, size(data_e, 1), :)
 #events.latency .+= repeat(range(0,length=size(data,2),step=size(data,1)),inner=size(events[events.subject.=="S01",:],1))
+# ```@raw html
+# </details >
+# ```
 
-
-
-# # Fit LMM 
+# ## 2. Fit mass-univariate LMMs
+# We have some typical experimental data with subject and item effects. Item refer to stimuli here, based on our `stimtype` condition these are either different `cars` or `faces`.
 m = fit(
     UnfoldModel,
     [
@@ -70,8 +80,16 @@ m = fit(
 );
 
 
-# # Cluster Permute :)
+# ## 3. Cluster permutation test
+# If we would run a statistical test on each time-point separately, we would greatly inflate the type-1 error, reaching significance on any each sample much higher than the assumed α=0.05.
+# One solution are cluster permutation test, where we instead test for clustersizes of connected significant clusters. In "classical" two-stage testing, such a permutation test is straight forward. But for LMMs we have to think of something more clever, as it is not directly clear how to permute if both subject and item effects exist (you gonna break the relation between the two). We did that in `MixedModelsPermutations` and can apply this strategy to EEG data as well.`
+
+# select the fixed-effects coefficient to test (`stimtype`)
 coefficient = 2
+
+# call the permutatio test
+# !!! note
+#      This interface is very likely to change in the future
 pvalue(
     MersenneTwister(1),
     m,
