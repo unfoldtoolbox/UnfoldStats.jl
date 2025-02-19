@@ -2,18 +2,22 @@
 #       This functionality is not extensively tested. While it returns reasonable results, we haven't written any unit-tests, nor tested the type-1 error probability yet
 
 
+# ## 0. Setup
+# If you want to do LMM + cluster permutations, you at least need these packages (more for the simulation below)
+using UnfoldMixedModels
+using MixedModelsPermutations, ClusterDepth
+using UnfoldStats
+
 # ## 1. Simulate data
 # This section can be skipped, if one already has (real) data that they want to analyse.
+
+
 
 # ```@raw html
 # <details>
 # <summary>Click to expand the simulation details</summary>
 # ```
 using UnfoldSim
-using UnfoldMixedModels
-
-using MixedModelsPermutations, ClusterDepth # both necessary to activate correct extension!
-using UnfoldStats
 using StatsModels
 using Random
 
