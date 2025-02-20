@@ -49,7 +49,7 @@ data_e, events = UnfoldSim.simulate(
 )
 times = range(-0.1, 0.5, length = size(data_e, 1))
 data_e = reshape(data_e, 1, size(data_e, 1), :)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr33"><span class="sgr1">┌ Warning: </span></span>No random generator defined, used the default (`Random.MersenneTwister(1)`) with a fixed seed. This will always return the same results and the user is strongly encouraged to provide their own random generator!
-<span class="sgr33"><span class="sgr1">└ </span></span><span class="sgr90">@ UnfoldSim ~/.julia/packages/UnfoldSim/1DN2P/src/simulation.jl:37</span></code></pre></details ><h2 id="2.-Fit-mass-univariate-LMMs"><a class="docs-heading-anchor" href="#2.-Fit-mass-univariate-LMMs">2. Fit mass-univariate LMMs</a><a id="2.-Fit-mass-univariate-LMMs-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Fit-mass-univariate-LMMs" title="Permalink"></a></h2><p>We have some typical experimental data with subject and item effects. Item refer to stimuli here, based on our <code>stimtype</code> condition these are either different <code>cars</code> or <code>faces</code>.</p><pre><code class="language-julia hljs">m = fit(
+<span class="sgr33"><span class="sgr1">└ </span></span><span class="sgr90">@ UnfoldSim ~/.julia/packages/UnfoldSim/JzrqI/src/simulation.jl:17</span></code></pre></details ><h2 id="2.-Fit-mass-univariate-LMMs"><a class="docs-heading-anchor" href="#2.-Fit-mass-univariate-LMMs">2. Fit mass-univariate LMMs</a><a id="2.-Fit-mass-univariate-LMMs-1"></a><a class="docs-heading-anchor-permalink" href="#2.-Fit-mass-univariate-LMMs" title="Permalink"></a></h2><p>We have some typical experimental data with subject and item effects. Item refer to stimuli here, based on our <code>stimtype</code> condition these are either different <code>cars</code> or <code>faces</code>.</p><pre><code class="language-julia hljs">m = fit(
     UnfoldModel,
     [
         Any =&gt; (
@@ -59,7 +59,7 @@ data_e = reshape(data_e, 1, size(data_e, 1), :)</code></pre><pre class="document
     ],
     events,
     data_e,
-);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">Progress:  17%|██████▉                                  |  ETA: 0:00:10</span>
+);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi"><span class="sgr32">Progress:  17%|██████▉                                  |  ETA: 0:00:08</span>
 <span class="sgr34">  channel:  1</span>
 <span class="sgr34">  time:     2</span>
 
@@ -72,16 +72,5 @@ data_e = reshape(data_e, 1, size(data_e, 1), :)</code></pre><pre class="document
     coefficient;
     n_permutations = 20,
     clusterforming_threshold = 1.8,
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">12-element Vector{Float64}:
- 1.0
- 1.0
- 1.0
- 0.06666666666666667
- 0.06666666666666667
- 1.0
- 1.0
- 1.0
- 1.0
- 1.0
- 1.0
- 1.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../test_splines/">« Two-stage multi parameter test (Hotelling&#39;s T-squared test)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Wednesday 19 February 2025 08:58">Wednesday 19 February 2025</span>. Using Julia version 1.11.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1×12 Matrix{Float64}:
+ 1.0  1.0  1.0  0.0666667  0.0666667  1.0  1.0  1.0  1.0  1.0  1.0  1.0</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../test_splines/">« Two-stage multi parameter test (Hotelling&#39;s T-squared test)</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.1 on <span class="colophon-date" title="Thursday 20 February 2025 14:12">Thursday 20 February 2025</span>. Using Julia version 1.11.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
