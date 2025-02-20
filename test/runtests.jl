@@ -6,5 +6,5 @@ include("setup.jl")
 end
 
 @testset "MixedModelsPermutations+ClusterDepth" begin
-    include("test-MixedModelsPermutations")
+    include("test-MixedModelsPermutations.jl")
 end
