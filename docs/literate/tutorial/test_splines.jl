@@ -46,7 +46,7 @@ signal = MixedModelComponent(;
     σs = σs,
 )
 
-hart = headmodel(type = "hartmut")
+hart = Hartmut()
 signal_multichannel = MultichannelComponent(signal, hart => "Left Postcentral Gyrus")
 
 onset = UniformOnset(; width = 50, offset = 60)
