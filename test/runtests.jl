@@ -2,5 +2,9 @@ using UnfoldStats
 include("setup.jl")
 
 @testset "UnfoldStats.jl" begin
-    include("extract_coefs.jl")
+    include("test-extract_coefs.jl")
+end
+
+@testset "MixedModelsPermutations+ClusterDepth" begin
+    include("test-MixedModelsPermutations")
 end

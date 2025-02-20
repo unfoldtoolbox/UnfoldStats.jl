@@ -16,7 +16,7 @@ function define_simulation(sim_type, β, σs; n_subjects = 30, n_items = 100, no
 
     # Specify component
     basis = p100()
-    formula = get_formula(sim_type)
+    formula = get_sim_formula(sim_type)
     signal = create_component(sim_type, basis, formula, β, σs)
 
     # Specify inter-onset distribution
@@ -36,12 +36,12 @@ function sim_and_fit(
 )
 
     # At the moment, the function is not implemented for mixed models
-    if model_type in [UnfoldLinearMixedModel, UnfoldLinearMixedModelContinuousTime]
+    if model_type in [UnfoldLinearMixedModelContinuousTime]
         throw("Not implemented.")
     end
 
     # Set parameter(s) for data simulation
-    if model_type == UnfoldLinearModel
+    if model_type == UnfoldLinearModel || model_type == UnfoldLinearMixedModel
         return_epoched = true
     else # UnfoldLinearModelContinuousTime
         return_epoched = false
@@ -51,28 +51,41 @@ function sim_and_fit(
     data, events = simulate_data(sim_type, simulation, return_epoched, seed)
 
     # Create event dict containing basis function(s)/times and formula(s) for all events
-    event_dict = create_event_vector(sim_type, model_type, simulation)
+    event_vec = create_event_vector(sim_type, model_type, simulation)
 
-    # Fit an Unfold model for each subject
-    subject_list = unique(events.subject)
-    model_list = model_type[]
+    if model_type == UnfoldLinearMixedModel
+        if length(size(data)) == 4
+            # if channels exist already
+            data = reshape(data, size(data)[1:end-2]..., :)
+        else
+            data = reshape(data, 1, size(data)[1:end-2]..., :)
+        end
+        m = fit(UnfoldModel, event_vec, events, data)
+        return DataFrame(subject = ["LMM - all subjects"], unfoldmodel = [m], data = [data])
 
-    # Slice the data by its last dimension (i.e. the subject dimension)
-    data_slices = eachslice(data, dims = ndims(data))
+    else
+        # Fit an Unfold model for each subject
+        subject_list = unique(events.subject)
+        model_list = model_type[]
 
-    for s = 1:size(data, ndims(data))
-        m = fit(
-            UnfoldModel,
-            event_dict,
-            subset(events, :subject => ByRow(==(subject_list[s]))),
-            data_slices[s],
-        )
-        push!(model_list, m)
+        # Slice the data by its last dimension (i.e. the subject dimension)
+        data_slices = eachslice(data, dims = ndims(data))
+
+        for s = 1:size(data, ndims(data))
+            m = fit(
+                UnfoldModel,
+                event_vec,
+                subset(events, :subject => ByRow(==(subject_list[s]))),
+                data_slices[s],
+            )
+            push!(model_list, m)
+        end
+
+        models =
+            DataFrame(subject = subject_list, unfoldmodel = model_list, data = data_slices)
+
+        return models
     end
-
-    models = DataFrame(subject = subject_list, unfoldmodel = model_list)
-
-    return models
 end
 
 simulate_data(sim_type::T, simulation, return_epoched, seed) where {T} =
@@ -106,6 +119,7 @@ create_event_vector(sim_type::T, model_type, simulation) where {T} = create_even
     simulation,
 )
 
+#=
 function create_event_vector(
     ::MultipleEventTypes,
     ::ManyPredictors,
@@ -113,69 +127,94 @@ function create_event_vector(
     simulation,
 )
     # Create times vector/basis function(s) (for model fitting)
-    if model_type == UnfoldLinearModel
-        #times = axes(data, 1)
-        times = 1:UnfoldSim.maxlength(simulation.components)
-        t_stim = times
-        t_fix = times
-    else # UnfoldLinearModelContinuousTime
-        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100, name = "stim")
-        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100, name = "fix")
-    end
-
-    # Define formula(s)
-    f_stim = @formula 0 ~ 1 + continuous
-    f_fix = @formula 0 ~ 1 + spl(continuous, 4) + continuous + condition * pet
+    t_stim, t_fix = create_timevec(model_type, UnfoldSim.maxlength(simulation.components))
 
     # Combine basis function(s)/times and formula(s) with the corresponding event
-    event_dict = Dict("stim" => (f_stim, t_stim), "fix" => (f_fix, t_fix))
-
-    return event_dict
-end
-
-function create_event_vector(
-    ::MultipleEventTypes,
-    ::OnlySplines,
-    model_type::Type{<:UnfoldModel},
-    simulation,
-)
-    # Create times vector/basis function(s) (for model fitting)
-    if model_type == UnfoldLinearModel
-        #times = axes(data, 1)
-        times = 1:UnfoldSim.maxlength(simulation.components)
-        t_stim = times
-        t_fix = times
-    else # UnfoldLinearModelContinuousTime
-        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100, name = "stim")
-        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100, name = "fix")
-    end
-
-    # Define formula(s)
-    f_stim = @formula 0 ~ 1
-    f_fix = @formula 0 ~ 1 + spl(continuous, 4)
-
-    # Combine basis function(s)/times and formula(s) with the corresponding event
-    event_vec = ["stim" => (f_stim, t_stim), "fix" => (f_fix, t_fix)]
+    event_vec = Dict("stim" => (f_stim, t_stim), "fix" => (f_fix, t_fix))
 
     return event_vec
 end
+=#
+function create_timevec(model_type, maxlength)
+    # Create times vector/basis function(s) (for model fitting)
+    if model_type == UnfoldLinearModel || model_type == UnfoldLinearMixedModel
+        #times = axes(data, 1)
+        times = 1:maxlength
+        t_stim = times
+        t_fix = times
+    else # UnfoldLinearModelContinuousTime
+        t_stim = firbasis(τ = (-0.1, 1.5), sfreq = 100)
+        t_fix = firbasis(τ = (-0.1, 1), sfreq = 100)
+    end
+    return t_stim, t_fix
+
+end
+
+create_timevec(model_type::SingleEventType, ml) =
+    create_timevec(MultipleEventTypes(), ml)[2]
 
 function create_event_vector(
+    event_style::EventStyle,
+    predictor_style::PredictorStyle,
+    model_type::Type{<:UnfoldModel},
+    simulation,
+)
+    times = create_timevec(model_type, UnfoldSim.maxlength(simulation.components))
+    # Define formula(s)
+    forms = get_fit_formulas(predictor_style, event_style, model_type)
+
+    @debug typeof(times) typeof(forms)
+    # Combine basis function(s)/times and formula(s) with the corresponding event
+    return create_eventvec(times, forms)
+
+end
+
+create_eventvec(times::Tuple, forms::Vector) =
+    ["stim" => (forms[1], times[1]), "fix" => (forms[2], times[2])]
+create_eventvec(times, forms) = [Any => (forms, times)]
+#get_fit_formulas(predictor_style::ManyPredictors,event_style,model_type) =
+#    @formula 0 ~ 1 + spl(continuous, 4) + continuous + condition * pet
+#get_fit_formulas(predictor_style::OnlySplines,event_style::SingleEventType,model_type) = @formula 0 ~ 1 + spl(continuous, 4)
+
+get_fit_formulas(
+    predictor_style::OnlySplines,
+    event_style::MultipleEventTypes,
+    model_type,
+) = [@formula(0 ~ 1), @formula(0 ~ 1 + spl(continuous, 4))]
+get_fit_formulas(
+    predictor_style::ManyPredictors,
+    event_style::MultipleEventTypes,
+    model_type,
+) = [
+    @formula(0 ~ 1 + continuous),
+    @formula(0 ~ 1 + spl(continuous, 4) + continuous + condition * pet),
+]
+get_fit_formulas(
+    predictor_style::CategoricalPredictors,
+    event_style::MultipleEventTypes,
+    model_type::Type{UnfoldLinearMixedModel},
+) = [@formula(0 ~ 1 + continuous + (1 | item)), @formula(0 ~ 1 + pet + (1 + pet | subject))]
+
+get_fit_formulas(predictor_style, event_style::SingleEventType, model_type) =
+    get_fit_formulas(predictor_style, MultipleEventTypes(), model_type)[2]
+
+
+
+
+#=
+function create_event_vector(
     ::SingleEventType,
-    ::ManyPredictors,
+    predictorstyle::Union{ManyPredictors,OnlySplines},
     model_type::Type{<:UnfoldModel},
     simulation,
 )
     # Create times vector/basis function(s) (for model fitting)
-    if model_type == UnfoldLinearModel
-        #times = axes(data, 1)
-        t = 1:UnfoldSim.maxlength(simulation.components)
-    else # UnfoldLinearModelContinuousTime
-        t = firbasis((-0.1, 1.0), 100)
-    end
+    _, t = create_timevec(model_type, UnfoldSim.maxlength(simulation.components))
+
 
     # Define formula(s)
-    f = @formula 0 ~ 1 + spl(continuous, 4) + continuous + condition * pet
+    f = get_fit_formulas(predictor_style)
+
 
     # Combine basis function(s)/times and formula(s) with the corresponding event
     event_vec = [Any => (f, t)]
@@ -183,48 +222,21 @@ function create_event_vector(
     return event_vec
 end
 
-function create_event_vector(
-    ::SingleEventType,
-    ::OnlySplines,
-    model_type::Type{<:UnfoldModel},
-    simulation,
-)
-    # Create times vector/basis function(s) (for model fitting)
-    if model_type == UnfoldLinearModel
-        #times = axes(data, 1)
-        t = 1:UnfoldSim.maxlength(simulation.components)
-    else # UnfoldLinearModelContinuousTime
-        t = firbasis((-0.1, 1.0), 100)
-    end
-
-    # Define formula(s)
-    f = @formula 0 ~ 1 + spl(continuous, 4)
-
-    # Combine basis function(s)/times and formula(s) with the corresponding event
-    event_vec = [Any => (f, t)]
-
-    return event_vec
-end
-
+=#
 get_conditions(sim_type::T) where {T} = get_conditions(PredictorStyle(T))
+get_conditions(::CategoricalPredictors) =
+    Dict(:pet => ["cat", "dog"], :condition => ["face", "car"])
+get_conditions(::OnlySplines) = Dict(:continuous => range(-5, 5, length = 50))
+get_conditions(::ManyPredictors) = Dict(
+    :continuous => range(-5, 5, length = 25),
+    :condition => ["face", "car"],
+    :pet => ["cat", "dog"],
+)
 
-function get_conditions(::OnlySplines)
-    conditions = Dict(:continuous => range(-5, 5, length = 50))
-    return conditions
-end
 
-function get_conditions(::ManyPredictors)
-    conditions = Dict(
-        :continuous => range(-5, 5, length = 25),
-        :condition => ["face", "car"],
-        :pet => ["cat", "dog"],
-    )
-    return conditions
-end
+get_sim_formula(sim_type::T) where {T} = get_sim_formula(PredictorStyle(T))
 
-get_formula(sim_type::T) where {T} = get_formula(PredictorStyle(T))
-
-function get_formula(::OnlySplines)
+function get_sim_formula(::OnlySplines)
     formula = @formula(
         0 ~
             1 +
@@ -236,7 +248,7 @@ function get_formula(::OnlySplines)
     return formula
 end
 
-function get_formula(::ManyPredictors)
+function get_sim_formula(::ManyPredictors)
     formula = @formula(
         0 ~
             1 +
@@ -247,6 +259,10 @@ function get_formula(::ManyPredictors)
             pet +
             (1 + continuous + continuous^2 + continuous^3 | subject)
     )
+    return formula
+end
+function get_sim_formula(::CategoricalPredictors)
+    formula = @formula(0 ~ 1 + pet + (1 + pet | subject))
     return formula
 end
 

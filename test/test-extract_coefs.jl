@@ -1,4 +1,5 @@
 @testset "extract_coefs" begin
+    #---
     sim_type = UnitTestSimulation()
 
     # Print termnames to check how many β and σs values need to be defined
@@ -43,7 +44,11 @@
 
             # Test exceptions
             @test_throws ArgumentError extract_coefs(model_1, "continuous", "fix")
-            @test_throws ArgumentError extract_coefs(model_1, :continuous, "this-basis-doesnt-exist")
+            @test_throws ArgumentError extract_coefs(
+                model_1,
+                :continuous,
+                "this-basis-doesnt-exist",
+            )
             @test_throws ArgumentError extract_coefs(model_1, :pet, "stim")
 
             # Test `extract_coefs` method for single Unfold model
