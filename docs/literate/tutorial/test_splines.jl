@@ -210,19 +210,10 @@ tp_pvalues = plot_topoplotseries!(
         colorrange = (0, 0.1),
         colormap = :Reds,
     ),
-    colorbar = (; label = "p-value"),
+    colorbar = (; label = "p-value", limits = (0, 0.1), ticks = ([0.0, 0.1], ["0", "0.1"])),
 )
 
 ax = current_axis()
-
-# due to a bug in UnfoldMakie we have to fix the colorrange manually
-
-[
-    tp_pvalues.content[k].scene.plots[1].colorrange[] = (0, 0.1) for
-    k = 1:length(tp_pvalues.content)-2
-]
-tp_pvalues.content[end].colorrange[] = (0, 0.1)
-
 current_figure()
 
 # !!! note
