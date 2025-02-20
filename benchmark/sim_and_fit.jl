@@ -278,7 +278,7 @@ function create_component(::MultiChannel, basis, formula, β, σs)
     signal = MixedModelComponent(; basis = basis, formula = formula, β = β, σs = σs)
     # Wrap the component in a multichannel component
     # Load headmodel
-    hart = headmodel(type = "hartmut")
+    hart = Hartmut()
     source_idx = UnfoldSim.closest_src(hart, "Left Postcentral Gyrus")
     projection = UnfoldSim.magnitude(hart)
     # Only use the first channels/electrodes
