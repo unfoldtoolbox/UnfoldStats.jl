@@ -29,28 +29,26 @@ end
 
 @testset "lmm_permutations" begin
 
-    permuted =
-        ext.lmm_permutations(StableRNG(1), model, data, coefficient; n_permutations = 10)
+    permuted = ext.lmm_permutations(StableRNG(1), model, data, 2; n_permutations = 10)
     @test permuted ==
-          ext.lmm_permutations(StableRNG(1), model, data, coefficient; n_permutations = 10) # test for repeated permutations
-    @test size(permuted) == (1, 15, 10)
+          ext.lmm_permutations(StableRNG(1), model, data, 2; n_permutations = 10) # test for repeated permutations
+    @test size(permuted) == (3, 15, 10)
 
     _permuted = ext.lmm_permutations(
         StableRNG(1),
         model,
         data,
-        coefficient;
+        2;
         n_permutations = 10,
         time_selection = 5:7,
     )
-    @test size(_permuted) == (1, 3, 10)
-    @test permuted[1:1, 5:7, :] == _permuted
+    @test size(_permuted) == (3, 3, 10)
+    @test permuted[:, 5:7, :] == _permuted
 end
 
 @testset "lmm_clusterdepth_pvalues" begin
-    permuted =
-        ext.lmm_permutations(StableRNG(1), model, data, coefficient; n_permutations = 10)
-    observed = ext.get_lmm_statistic(model, coefficient, :z)
+    permuted = ext.lmm_permutations(StableRNG(1), model, data, 2; n_permutations = 10)
+    observed = ext.get_lmm_statistic(model, 2, :z)
 
     _observed = rand(length(observed)) .- 0.5
     @test all(

@@ -135,7 +135,7 @@ function create_event_vector(
     return event_vec
 end
 =#
-function create_timevec(model_type, maxlength)
+function create_timevec(model_type, event_type, maxlength)
     # Create times vector/basis function(s) (for model fitting)
     if model_type == UnfoldLinearModel || model_type == UnfoldLinearMixedModel
         #times = axes(data, 1)
@@ -150,8 +150,8 @@ function create_timevec(model_type, maxlength)
 
 end
 
-create_timevec(model_type::SingleEventType, ml) =
-    create_timevec(MultipleEventTypes(), ml)[2]
+create_timevec(model_type, event_type::SingleEventType, ml) =
+    create_timevec(model_type, MultipleEventTypes(), ml)[2]
 
 function create_event_vector(
     event_style::EventStyle,
@@ -159,11 +159,13 @@ function create_event_vector(
     model_type::Type{<:UnfoldModel},
     simulation,
 )
-    times = create_timevec(model_type, UnfoldSim.maxlength(simulation.components))
+    times =
+        create_timevec(model_type, event_style, UnfoldSim.maxlength(simulation.components))
     # Define formula(s)
     forms = get_fit_formulas(predictor_style, event_style, model_type)
 
     @debug typeof(times) typeof(forms)
+
     # Combine basis function(s)/times and formula(s) with the corresponding event
     return create_eventvec(times, forms)
 
