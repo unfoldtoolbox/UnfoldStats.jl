@@ -1,0 +1,31 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: UnfoldStats.jl
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Judith
+    family-names: Schepers
+    email: judith.schepers@vis.uni-stuttgart.de
+    affiliation: University of Stuttgart
+    orcid: 'https://orcid.org/0009-0000-9270-730X'
+  - given-names: Benedikt Valerian
+    family-names: Ehinger
+    email: benedikt.ehinger@vis.uni-stuttgart.de
+    affiliation: University of Stuttgart
+    orcid: 'https://orcid.org/0000-0002-6276-3332'
+repository-code: 'https://github.com/unfoldtoolbox/UnfoldStats.jl/'
+abstract: >-
+  Implementing and documenting statistical tests for Unfold.jl fitted models, including multiple-comparisons corrections.
+keywords:
+  - EEG
+  - Statistics
+  - Deconvolution
+  - Multiple Comparisons
+  - Regression
+
+license: MIT
