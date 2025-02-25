@@ -12,8 +12,8 @@
 A toolbox for statistical testing of EEG/ERP data and Unfold.jl models.
 Build on the [Unfold](https://github.com/unfoldtoolbox/unfold.jl/).
 
-We currently support: 
-
+> [!CAUTION]
+> This package is work in progress. We have not (yet) extensively checked the validity and correctness of the statistical tests. While we think these are valid approaches, we have ongoing studies investigating whether this is actually the case. If you notice some unexpected behavior please open an issue!
 
 ## Install
 
