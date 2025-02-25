@@ -1,4 +1,5 @@
 @testset "extract_coefs" begin
+    #---
     sim_type = UnitTestSimulation()
 
     # Print termnames to check how many β and σs values need to be defined
@@ -8,13 +9,12 @@
     σs = Dict(:subject => [1, 0.1, 0.1, 0.1])
 
     simulation = define_simulation(sim_type, β, σs, n_subjects = 5)
-
     for model_type in [UnfoldLinearModel, UnfoldLinearModelContinuousTime]
 
         models = sim_and_fit(sim_type, simulation, model_type, seed = 1)
         model_1 = models[1, :unfoldmodel]
 
-        symbols = UnfoldStats.extract_symbol(Unfold.formula(model_1))
+        symbols = UnfoldStats.extract_symbol(Unfold.formulas(model_1))
 
         if model_type == UnfoldLinearModel
 
@@ -39,21 +39,25 @@
             @test UnfoldStats.get_predictor_string((:condition, :pet)) ==
                   "(:condition, :pet)"
 
-            @test UnfoldStats.get_basisnames(model_1) ==
-                  reduce(vcat, fill.(["event: stim", "event: fix"], [2, 8]))
+            @test Unfold.get_basis_names(model_1) ==
+                  reduce(vcat, fill.(["stim", "fix"], [2, 8]))
 
             # Test exceptions
-            @test_throws ArgumentError extract_coefs(model_1, "continuous", "event: fix")
-            @test_throws ArgumentError extract_coefs(model_1, :continuous, "fix")
-            @test_throws ArgumentError extract_coefs(model_1, :pet, "event: stim")
+            @test_throws ArgumentError extract_coefs(model_1, "continuous", "fix")
+            @test_throws ArgumentError extract_coefs(
+                model_1,
+                :continuous,
+                "this-basis-doesnt-exist",
+            )
+            @test_throws ArgumentError extract_coefs(model_1, :pet, "stim")
 
             # Test `extract_coefs` method for single Unfold model
-            coefs_1 = extract_coefs(model_1, :continuous, "event: fix")
+            coefs_1 = extract_coefs(model_1, :continuous, "fix")
             @test size(coefs_1) == (3, 15, 4)
             @test coefs_1[:] ==
                   subset(
                 coeftable(model_1),
-                :basisname => ByRow(==("event: fix")),
+                :eventname => ByRow(==("fix")),
                 :coefname => ByRow(
                     x -> x in [
                         "continuous",
@@ -65,27 +69,28 @@
             ).estimate
 
             # Test `extract_coefs` method for a vector of Unfold models
-            coefs = extract_coefs(models.unfoldmodel, :continuous, "event: stim")
+            coefs = extract_coefs(models.unfoldmodel, :continuous, "stim")
             @test coefs[:, :, 1, 4][:] ==
                   subset(
                 coeftable(models[4, :unfoldmodel]),
-                :basisname => ByRow(==("event: stim")),
+                :eventname => ByRow(==("stim")),
                 :coefname => ByRow(==("continuous")),
             ).estimate
 
         else
             # Test helper functions
             @test length(symbols) == 1210
-            @test UnfoldStats.get_basisnames(model_1) ==
-                  reduce(vcat, fill.(["stimulus", "fixation"], [161 * 2, 111 * 8]))
+            @test Unfold.get_basis_names(model_1) |>
+                  x ->
+                vcat(x...) == reduce(vcat, fill.(["stim", "fix"], [161 * 2, 111 * 8]))
 
             # Test `extract_coefs` method for single Unfold model
-            coefs_1 = extract_coefs(model_1, :continuous, "fixation")
+            coefs_1 = extract_coefs(model_1, :continuous, "fix")
             @test size(coefs_1) == (3, 111, 4)
             @test coefs_1[:, 1, :][:] ==
                   subset(
                 coeftable(model_1),
-                :basisname => ByRow(==("fixation")),
+                :eventname => ByRow(==("fix")),
                 :coefname => ByRow(
                     x -> x in [
                         "continuous",
@@ -98,11 +103,11 @@
             ).estimate
 
             # Test `extract_coefs` method for a vector of Unfold models
-            coefs = extract_coefs(models.unfoldmodel, :continuous, "stimulus")
+            coefs = extract_coefs(models.unfoldmodel, :continuous, "stim")
             @test coefs[:, :, 1, 4][:] ==
                   subset(
                 coeftable(models[4, :unfoldmodel]),
-                :basisname => ByRow(==("stimulus")),
+                :eventname => ByRow(==("stim")),
                 :coefname => ByRow(==("continuous")),
             ).estimate
         end

@@ -11,6 +11,7 @@ using HypothesisTests
 using CairoMakie
 using UnfoldMakie
 
+
 # ## 1. Simulate data
 # This section can be skipped, if one already has (real) data that they want to analyse.
 
@@ -45,7 +46,7 @@ signal = MixedModelComponent(;
     σs = σs,
 )
 
-hart = headmodel(type = "hartmut")
+hart = Hartmut()
 signal_multichannel = MultichannelComponent(signal, hart => "Left Postcentral Gyrus")
 
 onset = UniformOnset(; width = 50, offset = 60)
@@ -55,7 +56,7 @@ noise = PinkNoise(; noiselevel = 5)
 # </details >
 # ```
 
-data, events = simulate(
+data, events = UnfoldSim.simulate(
     StableRNG(1),
     design,
     signal_multichannel,
@@ -83,7 +84,7 @@ basisfunction = firbasis((-0.1, 0.7), 100)
 formula = @formula 0 ~ 1 + spl(continuous, 4)
 
 ## Combine basisfunction and formula in an event dict
-event_dict = Dict(Any => (formula, basisfunction))
+event_vec = [Any => (formula, basisfunction)]
 
 subject_list = unique(events.subject)
 model_list = UnfoldLinearModelContinuousTime[]
@@ -94,7 +95,7 @@ data_slices = eachslice(data, dims = ndims(data))
 for s = 1:size(data, ndims(data))
     m = fit(
         UnfoldModel,
-        event_dict,
+        event_vec,
         subset(events, :subject => ByRow(==(subject_list[s]))),
         data_slices[s],
     )
@@ -124,7 +125,7 @@ effects_all_subjects = combine(
 ## Aggregate the marginal effects (per event type, time point and channel) over subjects
 ## using the mean as aggregation function
 aggregated_effects = @chain effects_all_subjects begin
-    groupby([:basisname, :channel, collect(keys(predictor_dict))..., :time])
+    groupby([:eventname, :channel, collect(keys(predictor_dict))..., :time])
     combine(:yhat .=> [x -> mean(skipmissing(x))] .=> Symbol("yhat_", mean))
 end;
 first(aggregated_effects, 5)
@@ -143,15 +144,15 @@ pos2d = [Point2f(p[1] + 0.5, p[2] + 0.5) for p in pos2d];
 # The rows (from top to bottom) represent the marginal effects for different levels of the predictor `continuous`.
 
 ## Set the size of the time bins for the topoplot series
-bin_size = 0.1
-
+bin_width = 0.1
+aggregated_effects.estimate = aggregated_effects.yhat_mean # bug in UnfoldMakie 0.5.12
 f_effects = Figure(size = (1200, 600))
 tp_effects = plot_topoplotseries!(
     f_effects,
-    aggregated_effects,
-    bin_size,
+    aggregated_effects;
+    bin_width,
     positions = pos2d,
-    mapping = (; y = :yhat_mean, row = :continuous),
+    mapping = (; y = :estimate, row = :continuous),
     visual = (; enlarge = 0.6, label_scatter = false, colorrange = (-3, 3)),
 )
 
@@ -172,8 +173,8 @@ current_figure()
 
 ## Extract the spline coefficients for the `continuous` predictor variable
 ## from the Unfold models of all subjects
-basisname = unique(effects_all_subjects.basisname)
-coefs = extract_coefs(models.unfoldmodel, :continuous, basisname)
+eventname = unique(effects_all_subjects.eventname)
+coefs = extract_coefs(models.unfoldmodel, :continuous, eventname)
 
 ## Conduct a one-sample Hotelling's T² test separately for all channels and time points
 ## and compute a p-value. We compare the spline coefficients vector against 0.
@@ -194,23 +195,25 @@ p_values_df = DataFrame(
 first(p_values_df, 5)
 
 # As a last step, we visualize the p-values in a topoplot series.
-bin_size = 0.1
-
+bin_width = 0.1
+p_values_df.estimate = p_values_df.p_values
 f_pvalues = Figure(size = (1200, 200))
 tp_pvalues = plot_topoplotseries!(
     f_pvalues,
-    p_values_df,
-    bin_size,
+    p_values_df;
+    bin_width,
     positions = pos2d,
-    mapping = (; y = :p_values),
-    visual = (; enlarge = 0.6, label_scatter = false, colorrange = (0, 0.1)),
-    colorbar = (; label = "p-value"),
+    mapping = (; y = :estimate),
+    visual = (;
+        enlarge = 0.6,
+        label_scatter = false,
+        colorrange = (0, 0.1),
+        colormap = :Reds,
+    ),
+    colorbar = (; label = "p-value", limits = (0, 0.1), ticks = ([0.0, 0.1], ["0", "0.1"])),
 )
 
 ax = current_axis()
-linkaxes!(tp_pvalues.content[1:end-2]...)
-xlims!(ax, 0, 0.9)
-ylims!(ax, 0, 0.9)
 current_figure()
 
 # !!! note

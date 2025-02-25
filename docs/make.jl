@@ -33,9 +33,12 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Tutorials" =>
-            ["Two-stage EEG analysis" => "generated/tutorial/two_stage_analysis.md"],
+        "Tutorials" => [
+            "Two-stage single parameter test (t-test)" => "tutorial/test_single_coefficient.md",
+            "Two-stage multi parameter test (Hotelling's T-squared test)" => "generated/tutorial/test_splines.md",
+            "**MixedModels** EEG + Cluster permutation test" => "generated/tutorial/lmm_clusterdepth.md",
+        ],
     ],
 )
 
-deploydocs(; repo = "github.com/unfoldtoolbox/UnfoldStats.jl", devbranch = "main")
+deploydocs(; repo = "github.com/unfoldtoolbox/UnfoldStats.jl", devbranch = "main", push_preview = true)

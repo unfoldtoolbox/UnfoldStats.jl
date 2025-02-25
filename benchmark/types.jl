@@ -3,6 +3,7 @@ abstract type SimulationType end
 abstract type PredictorStyle end
 struct OnlySplines <: PredictorStyle end
 struct ManyPredictors <: PredictorStyle end
+struct CategoricalPredictors <: PredictorStyle end
 PredictorStyle(::Type) = OnlySplines()
 
 abstract type ChannelStyle end
