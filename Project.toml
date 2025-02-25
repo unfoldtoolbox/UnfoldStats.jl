@@ -1,7 +1,7 @@
 name = "UnfoldStats"
 uuid = "96fd419a-8306-4ce8-ba5b-cd907cb7647c"
 authors = ["Judith Schepers", "Benedikt V. Ehinger"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 BSplineKit = "093aae92-e908-43d7-9660-e50ee39d5a0a"
