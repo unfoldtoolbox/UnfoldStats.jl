@@ -38,7 +38,12 @@ makedocs(;
             "Two-stage multi parameter test (Hotelling's T-squared test)" => "generated/tutorial/test_splines.md",
             "**MixedModels** EEG + Cluster permutation test" => "generated/tutorial/lmm_clusterdepth.md",
         ],
+        "API / Docstrings" => "api.md",
     ],
 )
 
-deploydocs(; repo = "github.com/unfoldtoolbox/UnfoldStats.jl", devbranch = "main", push_preview = true)
+deploydocs(;
+    repo = "github.com/unfoldtoolbox/UnfoldStats.jl",
+    devbranch = "main",
+    push_preview = true,
+)
