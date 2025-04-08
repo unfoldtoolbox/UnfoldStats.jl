@@ -3,7 +3,7 @@ CurrentModule = UnfoldStats
 ```
 
 # UnfoldStats.jl Documentation
-Welcome to [UnfoldStats.jl](https://github.com/unfoldtoolbox/UnfoldStats.jl)
+Welcome to [UnfoldStats.jl](https://github.com/unfoldtoolbox/UnfoldStats.jl): a Julia package for statistical testing of EEG/ERP data and [Unfold.jl](https://github.com/unfoldtoolbox/Unfold.jl) models.
 
 ```@raw html
 <div style="width:60%; margin: auto;">
@@ -11,6 +11,7 @@ Welcome to [UnfoldStats.jl](https://github.com/unfoldtoolbox/UnfoldStats.jl)
 ```
 
 ## Key features
+TBD
 
 ## Installation 
 ```julia-repl
@@ -19,39 +20,25 @@ julia> using Pkg; Pkg.add("UnfoldStats")
 For more detailed instructions please refer to [Installing Julia & Unfold Packages](https://unfoldtoolbox.github.io/UnfoldDocs/main/installation/).
 
 
-
 ## Usage example
+TBD
 
 ## Where to start: Learning roadmap
 ### 1. First steps
-📌 Goal: 
-🔗 
+📌 Goal: TBD
+🔗 TBD
 
 ### 2. Intermediate topics
-📌 Goal: 
-🔗
+📌 Goal: TBD
+🔗 TBD
 
 ### 3. Advanced topics
-📌 Goal: 
-🔗
+📌 Goal: TBD
+🔗 TBD
 
-
-
-
-
-
-# UnfoldStats
-
-Documentation for [UnfoldStats](https://github.com/unfoldtoolbox/UnfoldStats.jl).
-
-```@index
-```
-
-```@autodocs
-Modules = [UnfoldStats]
-```
 
 ## Statement of need 
+TBD
 
 ```@raw html
 <!---
