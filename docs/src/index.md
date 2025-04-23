@@ -25,15 +25,15 @@ TBD
 
 ## Where to start: Learning roadmap
 ### 1. First steps
-📌 Goal: TBD
+📌 Goal: TBD \
 🔗 TBD
 
 ### 2. Intermediate topics
-📌 Goal: TBD
+📌 Goal: TBD \
 🔗 TBD
 
 ### 3. Advanced topics
-📌 Goal: TBD
+📌 Goal: TBD \
 🔗 TBD
 
 
