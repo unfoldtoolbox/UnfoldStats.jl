@@ -37,7 +37,8 @@ function calculate_mse(results::DataFrame, ground_truth::DataFrame, effects_dict
 
     # Add event to dict to make dict_list
     full_factorial = factorproduct(((; k => v) for (k, v) in pairs(effects_dict))...) |> DataFrame
-
+    @debug "Full Factorial DataFrame:" full_factorial
+    
     # In singular events ground_truth doesn't have an event collumn
     if !("event" ∈ names(ground_truth))
         ground_truth[:, :event] .= Any
@@ -55,10 +56,18 @@ function calculate_mse(results::DataFrame, ground_truth::DataFrame, effects_dict
         for row in eachrow(full_factorial)
             collums = Symbol.(names(row))
             tmp_value = values(row)
+            
+            @debug "Current Factorial Row:" row
+            @debug "Current Factorial Columns:" collums
+            @debug "Current Factorial Values:" tmp_value
 
+            #error("This is a debug message to check the current factorial row, columns, and values.")
             # Filter both groups and calculate MSE on current factorial 
-            d1 = subset(both_groups[1], collums => x -> x .== tmp_value) # I am not entirely sure why this works, but it does
-            d2 = subset(both_groups[2], collums => x -> x .== tmp_value)
+            d1 = subset(both_groups[1], [col => x -> x .== val for (col, val) in zip(collums, tmp_value)])
+            d2 = subset(both_groups[2], [col => x -> x .== val for (col, val) in zip(collums, tmp_value)])
+            @debug "Filtered Results Group:" d1
+            @debug "Filtered Ground Truth Group:" d2
+
             push!(tmp_mse, mean(d1.yhat .- d2.yhat) .^ 2)
             @debug d1, d2
 
