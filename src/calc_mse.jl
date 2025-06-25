@@ -68,7 +68,7 @@ function calculate_mse(results::DataFrame, ground_truth::DataFrame, effects_dict
             @debug "Filtered Results Group:" d1
             @debug "Filtered Ground Truth Group:" d2
 
-            push!(tmp_mse, mean(d1.yhat .- d2.yhat) .^ 2)
+            push!(tmp_mse, mean((d2.yhat .- d1.yhat) .^ 2))
             @debug d1, d2
 
         end
