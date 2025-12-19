@@ -33,7 +33,7 @@ end
         ext.lmm_permutations(StableRNG(1), model, models.data[1], 2; n_permutations = 10)
     @test permuted ==
           ext.lmm_permutations(StableRNG(1), model, models.data[1], 2; n_permutations = 10) # test for repeated permutations
-    @test size(permuted) == (3, 15, 10)
+    @test size(permuted) == (3, 14, 10)
 
     _permuted = ext.lmm_permutations(
         StableRNG(1),
@@ -93,7 +93,7 @@ end
         n_permutations = 20,
         clusterforming_threshold = 1.8,
     )
-    @test size(p) == (3, 15)
+    @test size(p) == (3, 14)
     @test all(p[:, 4] .< 0.1)
 
 
