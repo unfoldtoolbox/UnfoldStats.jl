@@ -132,6 +132,7 @@ function lmm_clusterdepth_pvalues(rng, observed, permuted; clusterforming_thresh
         clusterforming_threshold;
         statfun = x -> abs.(x),
         nₚ = size(permuted, 3),
+        sidefun = x -> x
     )
 
     pvals = ClusterDepth.pvals(abs.(observed), J_tuple, clusterforming_threshold)
