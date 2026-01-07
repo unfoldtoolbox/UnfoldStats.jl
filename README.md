@@ -76,6 +76,7 @@ If you make use of these statistics, please cite:
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jschepers"><img src="https://avatars.githubusercontent.com/u/22366977?v=4?s=100" width="100px;" alt="Judith Schepers"/><br /><sub><b>Judith Schepers</b></sub></a><br /><a href="#infra-jschepers" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#test-jschepers" title="Tests">⚠️</a> <a href="#code-jschepers" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.benediktehinger.de"><img src="https://avatars.githubusercontent.com/u/10183650?v=4?s=100" width="100px;" alt="Benedikt Ehinger"/><br /><sub><b>Benedikt Ehinger</b></sub></a><br /><a href="#code-behinger" title="Code">💻</a> <a href="#bug-behinger" title="Bug reports">🐛</a> <a href="#doc-behinger" title="Documentation">📖</a> <a href="#infra-behinger" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rosagross"><img src="https://avatars.githubusercontent.com/u/43537429?v=4?s=100" width="100px;" alt="rosagross"/><br /><sub><b>rosagross</b></sub></a><br /><a href="#bug-rosagross" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
