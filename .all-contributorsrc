@@ -18,6 +18,18 @@
         "test",
         "code"
       ]
+    },
+    {
+      "login": "behinger",
+      "name": "Benedikt Ehinger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10183650?v=4",
+      "profile": "http://www.benediktehinger.de",
+      "contributions": [
+        "code",
+        "bug",
+        "doc",
+        "infra"
+      ]
     }
   ]
 }
