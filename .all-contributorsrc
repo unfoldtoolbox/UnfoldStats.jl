@@ -30,6 +30,15 @@
         "doc",
         "infra"
       ]
+    },
+    {
+      "login": "rosagross",
+      "name": "rosagross",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43537429?v=4",
+      "profile": "https://github.com/rosagross",
+      "contributions": [
+        "bug"
+      ]
     }
   ]
 }
