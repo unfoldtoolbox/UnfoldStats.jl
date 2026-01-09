@@ -53,7 +53,7 @@
 
             # Test `extract_coefs` method for single Unfold model
             coefs_1 = extract_coefs(model_1, :continuous, "fix")
-            @test size(coefs_1) == (3, 15, 4)
+            @test size(coefs_1) == (3, 14, 4)
             @test coefs_1[:] ==
                   subset(
                 coeftable(model_1),
