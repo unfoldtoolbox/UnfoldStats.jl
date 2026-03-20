@@ -1,12 +1,14 @@
 name = "UnfoldStats"
 uuid = "96fd419a-8306-4ce8-ba5b-cd907cb7647c"
-authors = ["Judith Schepers", "Benedikt V. Ehinger"]
 version = "0.2.2"
+authors = ["Judith Schepers", "Benedikt V. Ehinger"]
 
 [deps]
 BSplineKit = "093aae92-e908-43d7-9660-e50ee39d5a0a"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsAPI = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
 StatsModels = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 Unfold = "181c99d8-e21b-4ff3-b70b-c233eddec679"
@@ -23,12 +25,14 @@ UnfoldStatsMixedModelsPermutationsExt = ["UnfoldMixedModels", "ClusterDepth", "M
 [compat]
 BSplineKit = "0.16,0.17,0.18, 0.19"
 ClusterDepth = "0.2"
+LinearAlgebra = "1"
 Logging = "1"
 MixedModelsPermutations = "0.2"
 Random = "1"
+Statistics = "1"
 StatsAPI = "1"
 StatsModels = "0.7"
-Unfold = "0.8"
+Unfold = "0.8.10"
 UnfoldMixedModels = "0.1"
 julia = "1.10,1.11, 1.12"
 
