@@ -14,13 +14,14 @@ using UnfoldMakie
 using DataFrames
 # Set seed for reproducible cross-validation folds.
 Random.seed!(42)
-
+nothing##hide
 # # Generate two-class EEG data
 
 # Generate simulated multichannel EEG data with two conditions (classes).
 eeg, evts =
     UnfoldSim.predef_eeg(; return_epoched = true, multichannel = true, noiselevel = 1.0)
 fake_times = 1:size(eeg, 2)
+nothing ##hide
 # Check the event structure with condition variable
 first(evts, 5)
 
@@ -50,13 +51,13 @@ C = [-1, 1]
 # We use only the "baseline" period (first 10 time samples) to estimate a noise covariance.
 
 Y_baseline = eeg[:, 1:10, :]
-
+nothing##hide
 # Compute cvMANOVA's D for each timepoint 
 D_per_fold = cvMANOVA(m, Y_baseline; C = C)
 
 # Aggregate the discriminability statistic across all CV folds.
 D_mean = mean(D_per_fold)
-
+nothing ##hide
 # This is the time-resolved discriminability: higher values = better discrimination
 f, ax, h = series(reduce(hcat, D_per_fold)', linestyle = :dot)
 lines!(ax, D_mean, color = :black)
