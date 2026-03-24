@@ -159,32 +159,32 @@ fit!(m, eeg; solver = cv_solver) # note: we could have run the fit(...;solver=..
  -1.04301    -0.557165     0.621291      -0.636058   -1.63861   -0.357229
  -0.490728   -0.404589     0.511815   …   0.558512    0.648641   1.67634
  -0.253403    0.221419     0.351951       0.544773    1.77722    3.70482</code></pre><p>Compute cvMANOVA&#39;s D for each timepoint</p><pre><code class="language-julia hljs">D_per_fold = cvMANOVA(m, Y_baseline; C = C)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">5-element Vector{Vector{Float64}}:
- [-0.025627451560566995, -0.21817606230223704, -0.058932584645321036, 0.07541813425035979, 0.09241352700997756, 0.017688230870068523, -0.23943413577724032, 0.2893222233202169, -0.1369723747699642, 0.048630307988477256  …  -0.0078083631715789754, -0.014677770840446044, -0.10890045371648116, 0.242864464159592, -0.13118969920663276, -0.16722465437593018, 0.19737098656975546, 0.15541641153927654, 0.27992730668209903, -0.27082985903241696]
- [0.08614977920882239, 0.18108346791760252, -0.2897392536769325, 0.2306817231338424, 0.04372912781922358, -0.1512464640750196, -0.21760858812874967, 0.1951965715518865, -0.11646300671058911, -0.29080225809648574  …  -0.0770086167079227, -0.17337032543884418, 0.04708417310004743, 0.15949673741222858, -0.08919981298202023, -0.07834608095749994, 0.27755735542855253, -0.007511402782055665, -0.09810522274707045, 0.09321370125221315]
- [0.26151929339826663, -0.2154590480606544, -0.5003714721451858, 0.15345471964962254, -0.09525665779280715, -0.12077988276750752, -0.055128887389293536, -0.05104256601324539, 0.09517641718328698, -0.026520280424060773  …  -0.7006420955320218, -0.2100585212091637, -0.5423446455792114, 0.08555121777674732, -0.1554838110557079, -0.07586378988818153, -0.014195256182037026, 0.02835112003670412, 0.3546735897007559, -0.11160275101959745]
- [0.18656854055142386, -0.01743627422899721, 0.03084325518184198, 0.12394978912797765, -0.06063889820513864, 0.25211099505137424, -0.26997667555188226, -0.014319076570015424, 0.1911070312264584, -0.3223772352836824  …  -0.1396705710522403, -0.34718320346437614, -0.25496441648371204, 0.04877023173708716, -0.1712528784240544, -0.2674349727152252, 0.31953170087358473, -0.10397402333852906, 0.2335667421667072, -0.030277791913870793]
- [-0.2206965018223393, 0.14528741084081748, -0.052762554522030256, -0.29951764830641764, 0.20797216546685832, 0.11248967835817436, 0.0037116730267552633, 0.2181325859717322, 0.05558229276859683, 0.17390657771892423  …  -0.686720445594295, -0.29435869909276696, -0.037000327287662775, 0.30361472779893, -0.417947499872622, 0.03775845692170114, 0.13257082369616063, -0.3122215142492506, -0.03730662993381732, -0.27096965823292557]</code></pre><p>Aggregate the discriminability statistic across all CV folds.</p><pre><code class="language-julia hljs">D_mean = mean(D_per_fold)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">44-element Vector{Float64}:
-  0.05758273195512133
- -0.024940101166693728
- -0.17419252196152551
-  0.05679734357107694
-  0.037643852859622726
-  0.022052511487418002
- -0.15568732276408212
-  0.12745794765211496
-  0.017686071939557773
- -0.08343257761936547
+ [-0.07119551583475764, -0.019964967132556338, -0.1803884730307473, 0.19922261495048246, 0.32740498562396714, -0.014035591982095549, -0.13782322183892676, 0.04961552824996174, -0.13465241081446036, 0.08689885920716568  …  -0.3564511903761433, -0.5313008458040522, -0.24953951095580143, 0.04923324482814066, -0.10884905785832846, 0.01383682711665711, 0.37469075860377904, -0.06926574984351128, -0.10603855458874076, -0.011353439997786392]
+ [0.10473235387765926, -0.026399236980746872, -0.032889939013935506, 0.13756807557520392, -0.18930098597256872, 0.09919148699595949, -0.3217365115009118, 0.19364185087799102, 0.006869034925470027, -0.14688781339765816  …  -6.5429365355063815, -4.905359202377222, -2.8517184902931287, -2.2660297236366818, -1.2600345471375043, -0.6017583001591709, -0.20133237859267536, -0.09612548863748539, 0.34269365693565645, 0.39943473297280596]
+ [0.50297165279867, -0.16329951509543075, -0.2564959398397639, 0.028168114735899103, 0.10118241157395098, -0.18527042087884382, -0.0846248055539555, 0.21478557684693717, 0.07259899444449805, -0.5234756530560007  …  -0.5764154647941113, -0.4713374015846786, -0.06795210856706453, -0.05404724674191057, 0.0011378997612810496, 0.08038852837527685, 0.10737653851981019, -0.0193386220196999, -0.0159818591791321, -0.22793000368370048]
+ [0.4645950046929048, 0.03376559535555245, -0.21574554129856313, -0.1818391448549737, -0.13640706216099596, -0.0864978716920241, 0.2117441416422484, -0.06730103193841887, -0.12843147254852225, -0.21839041279805868  …  -0.9829976570251211, -1.004500424710443, -0.3989142376245146, -0.16764010020516715, -0.15661861792080528, -0.2277363929942875, 0.10219197493746546, -0.25173980385605416, 0.3742336756989388, -0.08375698322346235]
+ [0.13980400941634732, -0.046163338376755826, -0.18208502197776427, -0.24694851698039283, -0.0664488411855458, 0.2569922859579228, -0.4137209694108283, -0.14899170284432323, 0.17742157276114656, 0.18581881136960565  …  0.012708699291926615, 0.20325954585766753, 0.13054239637985196, 0.14609274285937443, -0.5883120737639593, -0.1663659707231622, 0.22855422335521566, -0.1628039790460673, -0.10898529554190381, -0.08129889089575507]</code></pre><p>Aggregate the discriminability statistic across all CV folds.</p><pre><code class="language-julia hljs">D_mean = mean(D_per_fold)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">44-element Vector{Float64}:
+  0.22818150099016474
+ -0.04441229244598746
+ -0.17352098303215482
+ -0.012765771314756213
+  0.007286101575761525
+  0.01407597768018376
+ -0.14923227333247477
+  0.04835004423842957
+ -0.001238856246373593
+ -0.12320724173498925
   ⋮
- -0.2079297040091194
- -0.17922513399340398
-  0.16805947577691702
- -0.19301474030820748
- -0.11022220820302715
-  0.1825671220772033
- -0.04798788175877093
-  0.14655115717373485
- -0.11809327178931954</code></pre><p>This is the time-resolved discriminability: higher values = better discrimination</p><pre><code class="language-julia hljs">f, ax, h = series(reduce(hcat, D_per_fold)&#39;, linestyle = :dot)
+ -1.3418476657237457
+ -0.6875163902121316
+ -0.458478216579249
+ -0.4225352793838633
+ -0.1803270616769373
+  0.12229622336471899
+ -0.11985472868056361
+  0.09718432466496371
+ -0.0009809169655796619</code></pre><p>This is the time-resolved discriminability: higher values = better discrimination</p><pre><code class="language-julia hljs">f, ax, h = series(reduce(hcat, D_per_fold)&#39;, linestyle = :dot)
 lines!(ax, D_mean, color = :black)
 
 plot_erp!(f[2, 1], subset(coeftable(m), :channel =&gt; (x -&gt; x .== 1)))
-f</code></pre><img src="48fedb74.png" alt="Example block output"/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../lmm_clusterdepth/">« <strong>MixedModels</strong> EEG + Cluster permutation test</a><a class="docs-footer-nextpage" href="../../../api/">API / Docstrings »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 24 March 2026 12:45">Tuesday 24 March 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+f</code></pre><img src="1e73e5a6.png" alt="Example block output"/><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../lmm_clusterdepth/">« <strong>MixedModels</strong> EEG + Cluster permutation test</a><a class="docs-footer-nextpage" href="../../../api/">API / Docstrings »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 24 March 2026 23:09">Tuesday 24 March 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
