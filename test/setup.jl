@@ -3,6 +3,7 @@ using UnfoldSim
 using Unfold
 using DataFrames
 using StableRNGs
+using LinearAlgebra
 
 
 using UnfoldMixedModels
