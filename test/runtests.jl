@@ -7,6 +7,7 @@ include("setup.jl")
 end
 @testset "cvMANOVA" begin
     include("test-cvMANOVA.jl")
+end
 @testset "MixedModelsPermutations+ClusterDepth" begin
     include("test-MixedModelsPermutations.jl")
 end
