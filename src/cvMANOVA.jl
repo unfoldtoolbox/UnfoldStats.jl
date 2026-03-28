@@ -66,6 +66,7 @@ It estimates the noise covariance matrix estimated from the given training data.
 - `C`: The contrast matrix for the training data (no default).
 - `C_test`: The contrast matrix for the test data (default: same as C).
 - `λ`: Regularization parameter for the noise covariance estimation (default: 0.0 - recommended to be quite small in 2014 paper)
+- `temporal_generalization`: calculate all training <-> testing time points, resulting in a matrix of output instead of a vector (the diagonal of the matrix would be the vector). Default off
 """
 function cvMANOVA(
     β_train::AbstractArray{T,3},
@@ -73,9 +74,10 @@ function cvMANOVA(
     X_train::AbstractMatrix,
     X_test::AbstractMatrix,
     Y_train::AbstractArray{T,3};
-    C,
-    C_test = C,
+    C::AbstractVector,
+    C_test::AbstractVector = C,
     λ = 0.0,
+    temporal_generalization = false
 ) where {T}
     # calculate noise regularized residual error covariance matrix
     Y_train_avg = dropdims(mean(Y_train, dims = 2), dims = 2)
@@ -84,30 +86,44 @@ function cvMANOVA(
     @debug size(Y_train_avg) size(X_train) size(B_train_avg)
     Ξ = Y_train_avg' - (X_train * B_train_avg) # "noise" residuals
 
-    global Σinv = calculate_Σinv(Ξ; λ)
+    Σinv = calculate_Σinv(Ξ; λ)
 
     # precalculate contrasts & contrast projection
     CC_train = C * pinv(C)
     CC_test = C * pinv(C_test) # no typo, really train * test ^-1
 
     # unclear why I need this
-    csfct = sum(C .!= 0) / sum(C_test .!= 0)
+    csfct = sum(C_test .!= 0) / sum(C .!= 0)
     CCXXCC = CC_train * X_test' * X_test * CC_test / csfct
 
     # calculate scaling factor
     n_train = size(X_train, 1)
-    n_test = size(X_test, 1)
+    #n_test = size(X_test, 1)
+    n_test = sum(sum(X_test * CC_test .!= 0; dims = 2) .> 0)
+    @debug "n_test" size(X_test, 1), n_test
+
+
     p = size(β_train, 1) # "voxels", channels here
     fE = n_train - rank(X_test) # residual degree of freedom
     scaling_factor = (fE - p - 1) / n_test
 
 
     # calculate D for each time-point
-    time_idx = 1:size(β_test, 2)
-    D = map(
-        t ->
-            cvmanova_D(CCXXCC, Σinv, β_train[:, t, :], β_test[:, t, :]; scaling_factor),
-        time_idx,
-    )
+    time_idx_train = 1:size(β_test, 2)
+    time_idx_test = temporal_generalization ? time_idx_train : [1]
+
+
+
+    D = reshape(map(
+        (t1, t2) -> cvmanova_D(
+            CCXXCC,
+            Σinv,
+            β_train[:, t1, :],
+            β_test[:, t2, :];
+            scaling_factor,
+        ),
+        repeat(time_idx_train, outer = length(time_idx_test)), #[1,2,3,1,2,3,1,2,3]
+        repeat(time_idx_test, inner = length(time_idx_train)), #[1,1,1,2,2,2,3,3,3]
+    ),length(time_idx_train),length(time_idx_test))
 
 end
