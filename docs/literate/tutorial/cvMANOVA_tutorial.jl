@@ -113,7 +113,8 @@ end
 # Cross decoding is only possible where veggie and animal share some representation, e.g. at the "p300" time window, but not at the "n170" time window, which was simulated specific to animals.
 
 ## Time Generalization
-import LinearAlgebra: diagf,ax,h = heatmap(D_temporal,axis=(;aspect=DataAspect()))
+import LinearAlgebra: diag
+f, ax, h = heatmap(D_temporal,axis=(;aspect=DataAspect()))
 lines!(ax,[0,size(D_temporal,1)],[0,size(D_temporal,2)]) # diag
 lines(f[1,2],diag(D_temporal)) 
 lines!(D_cross,linestyle=:dash)
