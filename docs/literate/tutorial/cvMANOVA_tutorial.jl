@@ -114,13 +114,6 @@ end
 
 ## Time Generalization
 import LinearAlgebra: diag
-f, ax, h = heatmap(D_temporal,axis=(;aspect=DataAspect()))
-lines!(ax,[0,size(D_temporal,1)],[0,size(D_temporal,2)]) # diag
-lines(f[1,2],diag(D_temporal)) 
-lines!(D_cross,linestyle=:dash)
-Label(f[1,1,TopLeft()],"A)")
-Label(f[1,1,TopLeft()],"B)")
-f
 
 D_temporal = mean(
     cvMANOVA(
