@@ -109,10 +109,13 @@ function cvMANOVA(
 
 
     # calculate D for each time-point
+    
     time_idx_train = 1:size(β_test, 2)
-    time_idx_test = temporal_generalization ? time_idx_train : [1]
-
-
+    time_idx_test = time_idx_train # assumes length(\beta_test) == length(\beta_train), but that should be given
+    if temporal_generalization
+        time_idx_train = repeat(time_idx_train, inner = length(time_idx_train)) #[1,2,3,1,2,3,1,2,3]
+        time_idx_test = repeat(time_idx_train, outer = length(time_idx_test)) ,#[1,1,1,2,2,2,3,3,3]
+    end
 
     D = map(
         (t1, t2) -> cvmanova_D(
@@ -122,12 +125,9 @@ function cvMANOVA(
             β_test[:, t2, :];
             scaling_factor,
         ),
-        repeat(time_idx_train, outer = length(time_idx_test)), #[1,2,3,1,2,3,1,2,3]
-        repeat(time_idx_test, inner = length(time_idx_train)), #[1,1,1,2,2,2,3,3,3]
+        time_idx_train, 
+        time_idx_test,
     )
-    if temporal_generalization
-        return  reshape(D, length(time_idx_train),length(time_idx_test)) # reshape to Matrix
-    else
-        return D # return the Vector directly
-    end
+    return temporal_generalization ?  reshape(D, length(time_idx_train),length(time_idx_test)) : D # return the Vector directly
+    
 end
