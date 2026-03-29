@@ -77,7 +77,7 @@ function cvMANOVA(
     C::AbstractVector,
     C_test::AbstractVector = C,
     λ = 0.0,
-    temporal_generalization = false
+    temporal_generalization = false,
 ) where {T}
     # calculate noise regularized residual error covariance matrix
     Y_train_avg = dropdims(mean(Y_train, dims = 2), dims = 2)
@@ -109,13 +109,15 @@ function cvMANOVA(
 
 
     # calculate D for each time-point
-    
-    time_idx_train = 1:size(β_test, 2)
-    time_idx_test = time_idx_train # assumes length(\beta_test) == length(\beta_train), but that should be given
+    n_samples = size(β_test, 2)
+    time_idx_train = 1:n_samples
+    time_idx_test = 1:n_samples # assumes length(\beta_test) == length(\beta_train), but that should be given
     if temporal_generalization
-        time_idx_train = repeat(time_idx_train, inner = length(time_idx_train)) #[1,2,3,1,2,3,1,2,3]
-        time_idx_test = repeat(time_idx_train, outer = length(time_idx_test)) #[1,1,1,2,2,2,3,3,3]
+        time_idx_train = repeat(time_idx_train, inner = n_samples) #[1,2,3,1,2,3,1,2,3]
+        time_idx_test = repeat(time_idx_test, outer = n_samples) #[1,1,1,2,2,2,3,3,3]
     end
+    @debug "time_idx_train" time_idx_train
+    @debug "time_idx_test" time_idx_test
 
     D = map(
         (t1, t2) -> cvmanova_D(
@@ -125,9 +127,9 @@ function cvMANOVA(
             β_test[:, t2, :];
             scaling_factor,
         ),
-        time_idx_train, 
+        time_idx_train,
         time_idx_test,
     )
-    return temporal_generalization ?  reshape(D, size(β_test,2),size(β_test,2)) : D # return the Vector directly
-    
+    return temporal_generalization ? reshape(D, n_samples, n_samples) : D # return the Vector directly
+
 end

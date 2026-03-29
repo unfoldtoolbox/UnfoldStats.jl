@@ -125,7 +125,11 @@ D_temporal = mean(
     ),
 )
 let
-    f, ax, h = heatmap(D_temporal, axis = (; aspect = DataAspect()))
+    f, ax, h = heatmap(
+        D_temporal,
+        axis = (; aspect = DataAspect(), xlabel = "test time", ylabel = "train time"),
+        colormap = :viridis,
+    )
     lines!(ax, [0, size(D_temporal, 1)], [0, size(D_temporal, 2)]) # diag
     lines(f[1, 2], diag(D_temporal), label = "diag(temp-gen)")
     lines!(D_cross, linestyle = :dash, label = "vector")
