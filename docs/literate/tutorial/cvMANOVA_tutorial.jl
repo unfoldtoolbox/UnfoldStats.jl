@@ -138,5 +138,5 @@ let
     Label(f[1, 1, TopLeft()], "B)")
     f
 end
-# A) shows the temporal generalization matrix, where the x-axis is the training time and the y-axis is the testing time. Here one can see that training at sample 20 allows decoding at sample 30
+# A) shows the temporal generalization matrix, where the x-axis is the test time and the y-axis is the training time. Here one can see, besides the diagonal cross-decoding, that training at sample ~15 allows decoding at sample 30
 # B) The diagonal of this matrix is equivalent to the "normal" way as discussed before
