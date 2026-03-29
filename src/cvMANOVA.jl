@@ -114,7 +114,7 @@ function cvMANOVA(
     time_idx_test = time_idx_train # assumes length(\beta_test) == length(\beta_train), but that should be given
     if temporal_generalization
         time_idx_train = repeat(time_idx_train, inner = length(time_idx_train)) #[1,2,3,1,2,3,1,2,3]
-        time_idx_test = repeat(time_idx_train, outer = length(time_idx_test)) ,#[1,1,1,2,2,2,3,3,3]
+        time_idx_test = repeat(time_idx_train, outer = length(time_idx_test)) #[1,1,1,2,2,2,3,3,3]
     end
 
     D = map(
