@@ -128,6 +128,6 @@ function cvMANOVA(
         time_idx_train, 
         time_idx_test,
     )
-    return temporal_generalization ?  reshape(D, length(time_idx_train),length(time_idx_test)) : D # return the Vector directly
+    return temporal_generalization ?  reshape(D, size(β_test,2),size(β_test,2)) : D # return the Vector directly
     
 end
