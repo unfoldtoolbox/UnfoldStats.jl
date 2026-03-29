@@ -114,7 +114,7 @@ function cvMANOVA(
 
 
 
-    D = reshape(map(
+    D = map(
         (t1, t2) -> cvmanova_D(
             CCXXCC,
             Σinv,
@@ -124,6 +124,10 @@ function cvMANOVA(
         ),
         repeat(time_idx_train, outer = length(time_idx_test)), #[1,2,3,1,2,3,1,2,3]
         repeat(time_idx_test, inner = length(time_idx_train)), #[1,1,1,2,2,2,3,3,3]
-    ),length(time_idx_train),length(time_idx_test))
-
+    )
+    if temporal_generalization
+        return  reshape(D, length(time_idx_train),length(time_idx_test)) # reshape to Matrix
+    else
+        return D # return the Vector directly
+    end
 end
