@@ -14,7 +14,7 @@ using UnfoldMakie
 using DataFrames
 # Set seed for reproducible cross-validation folds.
 Random.seed!(42)
-
+nothing##hide
 # # Generate two-class EEG data
 
 
@@ -43,6 +43,7 @@ eeg, evts = UnfoldSim.predef_eeg(
 
 
 fake_times = 1:size(eeg, 2)
+nothing ##hide
 # Check the event structure with condition variable
 first(evts, 5)
 
@@ -75,13 +76,13 @@ C = [-1, 1, 0, 0]
 # We use only the "baseline" period (first 10 time samples) to estimate a noise covariance.
 
 Y_baseline = eeg[:, 1:10, :]
-
+nothing##hide
 # Compute cvMANOVA's D for each timepoint 
 D_per_fold = cvMANOVA(m, Y_baseline; C = C)
 
 # Aggregate the discriminability statistic across all CV folds.
 D_mean = mean(D_per_fold)
-
+nothing ##hide
 # This is the time-resolved discriminability: higher values = better discrimination
 let
     f, ax, h = series(reduce(hcat, D_per_fold)', linestyle = :dot)
@@ -112,7 +113,13 @@ end
 # Cross decoding is only possible where veggie and animal share some representation, e.g. at the "p300" time window, but not at the "n170" time window, which was simulated specific to animals.
 
 ## Time Generalization
-import LinearAlgebra: diag
+import LinearAlgebra: diagf,ax,h = heatmap(D_temporal,axis=(;aspect=DataAspect()))
+lines!(ax,[0,size(D_temporal,1)],[0,size(D_temporal,2)]) # diag
+lines(f[1,2],diag(D_temporal)) 
+lines!(D_cross,linestyle=:dash)
+Label(f[1,1,TopLeft()],"A)")
+Label(f[1,1,TopLeft()],"B)")
+f
 
 D_temporal = mean(
     cvMANOVA(
