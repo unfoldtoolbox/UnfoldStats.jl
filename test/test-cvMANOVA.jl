@@ -33,7 +33,15 @@ using UnfoldSim
         Y_train = randn(rng, n_chan, 5, n_train)
 
         C = [-1, 1] #Matrix{Float64}(I, n_coef, n_coef)
-        D = UnfoldStats.cvMANOVA(β_train, β_test, X_train, X_test, Y_train; C = C, λ = 0.05)
+        D = UnfoldStats.cvMANOVA(
+            β_train,
+            β_test,
+            X_train,
+            X_test,
+            Y_train;
+            C = C,
+            Σinv_kwargs = (; λ = 0.05),
+        )
 
         @test D isa AbstractArray
         @test length(D) == n_time
