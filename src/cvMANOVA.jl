@@ -1,12 +1,14 @@
 
 """
     calculate_Σinv(Ξ;λ=0.)
+    calculate_Σinv(Y_train, X_train; λ = 0.0, average_first = true)
 Calculate the regularized inverse of the noise covariance matrix from the residuals Ξ, with optional regularization parameter λ.
 Regularization towards the diagonal is used, the Ledoit-Wolf shrinkage method.
 
 # Arguments
 - `Ξ`: The residuals, used to estimate the noise covariance (ch x time)
 - `λ`: Regularization parameter for the noise covariance estimation (default: 0.0 - recommended to be quite small in 2014 paper)
+- `average_first`: Whether to average the training data before estimating the noise covariance (true), or calculate noise covariances and then average (false) (default: false)
 """
 function calculate_Σinv(Ξ; λ = 0.0)
     Σ = Ξ'Ξ # error covariance matrix
@@ -15,6 +17,23 @@ function calculate_Σinv(Ξ; λ = 0.0)
     Σinv = Σ_reg^-1  # invert
 end
 
+function calculate_Σinv(Y_train, X_train; λ = 0.0, average_first = false)
+
+    if average_first
+        Y_train_avg = dropdims(mean(Y_train, dims = 2), dims = 2)
+        B_train_avg = X_train \ Y_train_avg'
+
+        @debug size(Y_train_avg) size(X_train) size(B_train_avg)
+        Ξ = Y_train_avg' - (X_train * B_train_avg) # "noise" residuals
+        return calculate_Σinv(Ξ; λ)
+    else
+        B_train = Unfold.coef(Unfold.solver_default(X_train, Y_train))
+        Ξ = map(t -> Y_train[:, t, :]' - (X_train * B_train[:, t, :]'), 1:size(Y_train, 2)) # "noise" residuals
+        return mean(calculate_Σinv.(Ξ; λ))
+    end
+
+
+end
 function cvmanova_D(CCXXCC, Σinv, B_train, B_test; scaling_factor = 1)
     D = scaling_factor * tr(B_train * CCXXCC * B_test' * Σinv)
 end
@@ -65,7 +84,8 @@ It estimates the noise covariance matrix estimated from the given training data.
 # Keyword Arguments
 - `C`: The contrast matrix for the training data (no default).
 - `C_test`: The contrast matrix for the test data (default: same as C).
-- `λ`: Regularization parameter for the noise covariance estimation (default: 0.0 - recommended to be quite small in 2014 paper)
+- `Σinv_kwargs`: Keyword arguments for the noise covariance estimation (default: `λ = 0.0``, `average_first = false`)
+- `temporal_generalization`: calculate all training <-> testing time points, resulting in a matrix of output instead of a vector (the diagonal of the matrix would be the vector). Default off
 """
 function cvMANOVA(
     β_train::AbstractArray{T,3},
@@ -73,41 +93,58 @@ function cvMANOVA(
     X_train::AbstractMatrix,
     X_test::AbstractMatrix,
     Y_train::AbstractArray{T,3};
-    C,
-    C_test = C,
-    λ = 0.0,
+    C::AbstractVector,
+    C_test::AbstractVector = C,
+    Σinv_kwargs = (; λ = 0.0),
+    temporal_generalization = false,
 ) where {T}
     # calculate noise regularized residual error covariance matrix
-    Y_train_avg = dropdims(mean(Y_train, dims = 2), dims = 2)
-    B_train_avg = X_train \ Y_train_avg'
 
-    @debug size(Y_train_avg) size(X_train) size(B_train_avg)
-    Ξ = Y_train_avg' - (X_train * B_train_avg) # "noise" residuals
+    Σinv = calculate_Σinv(Y_train, X_train; Σinv_kwargs...)
 
-    global Σinv = calculate_Σinv(Ξ; λ)
 
     # precalculate contrasts & contrast projection
     CC_train = C * pinv(C)
     CC_test = C * pinv(C_test) # no typo, really train * test ^-1
 
     # unclear why I need this
-    csfct = sum(C .!= 0) / sum(C_test .!= 0)
+    csfct = sum(C_test .!= 0) / sum(C .!= 0)
     CCXXCC = CC_train * X_test' * X_test * CC_test / csfct
 
     # calculate scaling factor
     n_train = size(X_train, 1)
-    n_test = size(X_test, 1)
+    #n_test = size(X_test, 1)
+    n_test = sum(sum(X_test * CC_test .!= 0; dims = 2) .> 0)
+    @debug "n_test" size(X_test, 1), n_test
+
+
     p = size(β_train, 1) # "voxels", channels here
     fE = n_train - rank(X_test) # residual degree of freedom
     scaling_factor = (fE - p - 1) / n_test
 
 
     # calculate D for each time-point
-    time_idx = 1:size(β_test, 2)
+    n_samples = size(β_test, 2)
+    time_idx_train = 1:n_samples
+    time_idx_test = 1:n_samples # assumes length(\beta_test) == length(\beta_train), but that should be given
+    if temporal_generalization
+        time_idx_train = repeat(time_idx_train, inner = n_samples) #[1,2,3,1,2,3,1,2,3]
+        time_idx_test = repeat(time_idx_test, outer = n_samples) #[1,1,1,2,2,2,3,3,3]
+    end
+    @debug "time_idx_train" time_idx_train
+    @debug "time_idx_test" time_idx_test
+
     D = map(
-        t ->
-            cvmanova_D(CCXXCC, Σinv, β_train[:, t, :], β_test[:, t, :]; scaling_factor),
-        time_idx,
+        (t1, t2) -> cvmanova_D(
+            CCXXCC,
+            Σinv,
+            β_train[:, t1, :],
+            β_test[:, t2, :];
+            scaling_factor,
+        ),
+        time_idx_train,
+        time_idx_test,
     )
+    return temporal_generalization ? reshape(D, n_samples, n_samples) : D # return the Vector directly
 
 end
